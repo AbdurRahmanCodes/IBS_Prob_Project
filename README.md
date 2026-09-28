@@ -26,7 +26,12 @@ A full-stack task management app: Users → Projects → Tasks.
     cp .env.example .env
     npm install
     npm run dev
+### Run the frontend
+    cd frontend
+    pnpm install
+    pnpm dev
 
+Open http://localhost:3000
 ## Workflow
 - Never commit directly to `main`.
 - Branch naming: `feat/...`, `fix/...`, `chore/...`
