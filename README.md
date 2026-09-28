@@ -15,6 +15,7 @@ A full-stack task management app: Users → Projects → Tasks.
 
 ### Prerequisites
 - Node.js 20+
+- pnpm (enable with `corepack enable pnpm`)
 - Docker
 
 ### Run the database
