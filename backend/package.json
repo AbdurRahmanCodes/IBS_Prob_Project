@@ -1,5 +1,6 @@
 {
   "name": "backend",
+  "packageManager": "pnpm@12.6.0",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
