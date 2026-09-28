@@ -10,7 +10,6 @@ A full-stack task management app: Users → Projects → Tasks.
 - `backend/`: GraphQL + REST API
 - `frontend/`: web app
 
-
 ## Getting started
 
 ### Prerequisites
@@ -24,14 +23,16 @@ A full-stack task management app: Users → Projects → Tasks.
 ### Run the backend
     cd backend
     cp .env.example .env
-    npm install
-    npm run dev
+    pnpm install
+    pnpm dev
+
 ### Run the frontend
     cd frontend
     pnpm install
     pnpm dev
 
 Open http://localhost:3000
+
 ## Workflow
 - Never commit directly to `main`.
 - Branch naming: `feat/...`, `fix/...`, `chore/...`
