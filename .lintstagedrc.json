@@ -1,0 +1,8 @@
+{
+  "frontend/**/*.{ts,tsx,js,jsx,mjs}": [
+    "prettier --write",
+    "pnpm --dir frontend exec eslint --fix"
+  ],
+  "backend/**/*.{ts,js}": ["prettier --write"],
+  "*.{json,md,yml,yaml,css}": ["prettier --write"]
+}
