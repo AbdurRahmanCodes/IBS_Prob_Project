@@ -10,8 +10,21 @@ A full-stack task management app: Users → Projects → Tasks.
 - `backend/`: GraphQL + REST API
 - `frontend/`: web app
 
+
 ## Getting started
-_Setup instructions will be added as the project grows._
+
+### Prerequisites
+- Node.js 20+
+- Docker
+
+### Run the database
+    docker compose up -d
+
+### Run the backend
+    cd backend
+    cp .env.example .env
+    npm install
+    npm run dev
 
 ## Workflow
 - Never commit directly to `main`.
