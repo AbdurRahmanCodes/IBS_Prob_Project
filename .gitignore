@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Secrets: NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+.next/
+coverage/
+
+# OS / editor junk
+.DS_Store
+*.log
+.vscode/
