@@ -12,6 +12,14 @@ A full-stack task management app: Users → Projects → Tasks.
 - `backend/`: GraphQL + REST API
 - `frontend/`: web app
 
+## Monorepo tooling
+
+This repo uses a pnpm workspace (see `pnpm-workspace.yaml`) so that shared
+dev tooling (Prettier, Husky, lint-staged) can live at the root and apply
+across both apps. `backend/` and `frontend/` remain independent for their
+own runtime dependencies — the root `package.json` only holds dev tooling,
+nothing is shared at runtime.
+
 ## Getting started
 
 ### Prerequisites
