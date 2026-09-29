@@ -11,10 +11,15 @@ for (const key of requiredEnvVars) {
   }
 }
 
+const port = Number(process.env.DB_PORT);
+if (!Number.isInteger(port)) {
+  throw new Error("DB_PORT must be a number");
+}
+
 export const AppDataSource = new DataSource({
   type: "postgres",
   host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
+  port,
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
