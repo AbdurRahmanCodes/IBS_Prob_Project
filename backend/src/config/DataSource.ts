@@ -5,8 +5,7 @@ import { User } from "../entities/User";
 import { Project } from "../entities/Project";
 import { Task } from "../entities/Task";
 import { CreateUser1790748664766 } from "../migrations/1790748664766-CreateUser";
-import { CreateProjectAndTask1790761146960 } from "../migrations/1790761146960-CreateProjectAndTask";
-import { UpdateTaskProjectRelations1790762541316 } from "../migrations/1790762541316-UpdateTaskProjectRelations";
+import { CreateProjectAndTask1790764874290 } from "../migrations/1790764874290-CreateProjectAndTask";
 const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"];
 
 for (const key of requiredEnvVars) {
@@ -30,9 +29,5 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: process.env.NODE_ENV !== "production",
   entities: [User, Project, Task],
-  migrations: [
-    CreateUser1790748664766,
-    CreateProjectAndTask1790761146960,
-    UpdateTaskProjectRelations1790762541316,
-  ],
+  migrations: [CreateUser1790748664766, CreateProjectAndTask1790764874290],
 });
