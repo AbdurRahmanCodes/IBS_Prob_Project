@@ -12,25 +12,32 @@ async function main() {
   try {
     await AppDataSource.initialize();
     console.log("Database connection established");
-
-    const server = createServer((request, response) => {
-      if (request.method === "GET" && request.url === "/health") {
-        response.writeHead(200, { "Content-Type": "application/json" });
-        response.end(JSON.stringify({ status: "ok" }));
-        return;
-      }
-
-      response.writeHead(404, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({ error: "Not found" }));
-    });
-
-    server.listen(port, () => {
-      console.log(`HTTP server listening on port ${port}`);
-    });
   } catch (error) {
     console.error("Failed to connect to the database:", error);
     process.exit(1);
   }
+
+  const server = createServer((request, response) => {
+    const pathname = new URL(request.url ?? "/", "http://localhost").pathname;
+
+    if (request.method === "GET" && pathname === "/health") {
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ status: "ok" }));
+      return;
+    }
+
+    response.writeHead(404, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ error: "Not found" }));
+  });
+
+  server.on("error", (error) => {
+    console.error("HTTP server error:", error);
+    process.exit(1);
+  });
+
+  server.listen(port, () => {
+    console.log(`HTTP server listening on port ${port}`);
+  });
 }
 
 main();
