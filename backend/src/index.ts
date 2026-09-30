@@ -1,6 +1,12 @@
 import "reflect-metadata";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@as-integrations/express5";
+import cors from "cors";
+import express from "express";
 import { createServer } from "node:http";
 import { AppDataSource } from "./config/DataSource";
+import { resolvers } from "./graphql/resolvers";
+import { typeDefs } from "./graphql/schema";
 
 const port = Number(process.env.PORT ?? 4000);
 
@@ -17,18 +23,43 @@ async function main() {
     process.exit(1);
   }
 
-  const server = createServer((request, response) => {
-    const pathname = (request.url ?? "/").split("?")[0];
+  const app = express();
+  const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
-    if (request.method === "GET" && pathname === "/health") {
-      response.writeHead(200, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({ status: "ok" }));
-      return;
-    }
+  try {
+    await apolloServer.start();
+  } catch (error) {
+    console.error("Failed to start the GraphQL server:", error);
+    process.exit(1);
+  }
 
-    response.writeHead(404, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({ error: "Not found" }));
+  app.get("/health", (_request, response) => {
+    response.status(200).json({ status: "ok" });
   });
+
+  app.use("/graphql", cors(), express.json(), expressMiddleware(apolloServer));
+
+  app.use(
+    (
+      error: unknown,
+      _request: express.Request,
+      response: express.Response,
+      next: express.NextFunction,
+    ) => {
+      if (response.headersSent) {
+        next(error);
+        return;
+      }
+
+      response.status(400).json({ error: "Invalid request body" });
+    },
+  );
+
+  app.use((_request, response) => {
+    response.status(404).json({ error: "Not found" });
+  });
+
+  const server = createServer(app);
 
   server.on("error", (error) => {
     console.error("HTTP server error:", error);
