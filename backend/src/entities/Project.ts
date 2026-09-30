@@ -17,10 +17,10 @@ export class Project {
   @Column()
   name!: string;
 
-  @Column({ nullable: true })
-  description!: string;
+  @Column({ type: "varchar", nullable: true })
+  description!: string | null;
 
-  @ManyToOne(() => User, (user) => user.projects)
+  @ManyToOne(() => User, (user) => user.projects, { nullable: false, onDelete: "CASCADE" })
   owner!: User;
 
   @OneToMany(() => Task, (task) => task.project)

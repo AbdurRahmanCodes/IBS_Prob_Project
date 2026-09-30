@@ -22,8 +22,8 @@ export class Task {
   @Column()
   title!: string;
 
-  @Column({ nullable: true })
-  description!: string;
+  @Column({ type: "varchar", nullable: true })
+  description!: string | null;
 
   @Column({ type: "enum", enum: TaskStatus, default: TaskStatus.TODO })
   status!: TaskStatus;
@@ -32,13 +32,13 @@ export class Task {
   priority!: TaskPriority;
 
   @Column({ type: "timestamp", nullable: true })
-  dueDate!: Date;
+  dueDate!: Date | null;
 
-  @ManyToOne(() => Project, (project) => project.tasks)
+  @ManyToOne(() => Project, (project) => project.tasks, { nullable: false, onDelete: "CASCADE" })
   project!: Project;
 
-  @ManyToOne(() => User, (user) => user.assignedTasks)
-  assignee!: User;
+  @ManyToOne(() => User, (user) => user.assignedTasks, { nullable: true, onDelete: "SET NULL" })
+  assignee!: User | null;
 
   @CreateDateColumn()
   createdAt!: Date;
