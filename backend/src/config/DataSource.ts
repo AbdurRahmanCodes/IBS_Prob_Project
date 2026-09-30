@@ -2,6 +2,7 @@
 import "dotenv/config";
 import { DataSource } from "typeorm";
 import { User } from "../entities/User";
+import { CreateUser1790748664766 } from "../migrations/1790748664766-CreateUser";
 
 const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"];
 
@@ -26,5 +27,5 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: process.env.NODE_ENV !== "production",
   entities: [User],
-  migrations: [],
+  migrations: [CreateUser1790748664766],
 });
