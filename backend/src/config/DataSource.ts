@@ -1,6 +1,5 @@
 // Load .env here so the TypeORM CLI (migrations) also gets the DB settings
 import "dotenv/config";
-import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "../entities/User";
 
