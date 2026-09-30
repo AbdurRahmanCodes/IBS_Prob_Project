@@ -39,6 +39,22 @@ async function main() {
 
   app.use("/graphql", cors(), express.json(), expressMiddleware(apolloServer));
 
+  app.use(
+    (
+      error: unknown,
+      _request: express.Request,
+      response: express.Response,
+      next: express.NextFunction,
+    ) => {
+      if (response.headersSent) {
+        next(error);
+        return;
+      }
+
+      response.status(400).json({ error: "Invalid request body" });
+    },
+  );
+
   app.use((_request, response) => {
     response.status(404).json({ error: "Not found" });
   });
