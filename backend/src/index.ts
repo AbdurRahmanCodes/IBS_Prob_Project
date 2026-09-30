@@ -18,7 +18,7 @@ async function main() {
   }
 
   const server = createServer((request, response) => {
-    const pathname = new URL(request.url ?? "/", "http://localhost").pathname;
+    const pathname = (request.url ?? "/").split("?")[0];
 
     if (request.method === "GET" && pathname === "/health") {
       response.writeHead(200, { "Content-Type": "application/json" });
