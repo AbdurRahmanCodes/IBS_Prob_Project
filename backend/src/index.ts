@@ -4,6 +4,7 @@ import { expressMiddleware } from "@as-integrations/express5";
 import cors from "cors";
 import express from "express";
 import { createServer } from "node:http";
+import { createContext } from "./auth/context";
 import { AppDataSource } from "./config/DataSource";
 import { resolvers } from "./graphql/resolvers";
 import { typeDefs } from "./graphql/schema";
@@ -25,7 +26,11 @@ async function main() {
   }
 
   const app = express();
-  const apolloServer = new ApolloServer({ typeDefs, resolvers });
+  const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    includeStacktraceInErrorResponses: false,
+  });
 
   try {
     await apolloServer.start();
@@ -42,7 +47,9 @@ async function main() {
     "/graphql",
     cors({ origin: frontendUrl }),
     express.json(),
-    expressMiddleware(apolloServer),
+    expressMiddleware(apolloServer, {
+      context: async ({ req }) => createContext(req),
+    }),
   );
 
   app.use(

@@ -9,11 +9,29 @@ export const publicUserSelect: FindOptionsSelect<User> = {
 };
 
 export class UserRepository {
+  private repository = AppDataSource.getRepository(User);
+
   async findAll(): Promise<User[]> {
-    return AppDataSource.getRepository(User).find({
+    return this.repository.find({
       select: publicUserSelect,
       take: 100,
       order: { createdAt: "ASC" },
     });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.repository.findOne({ where: { email } });
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.repository.findOne({
+      select: publicUserSelect,
+      where: { id },
+    });
+  }
+
+  async create(email: string, name: string, passwordHash: string): Promise<User> {
+    const user = this.repository.create({ email, name, passwordHash });
+    return this.repository.save(user);
   }
 }
