@@ -3,6 +3,9 @@ import { hashPassword, verifyPassword } from "../auth/password";
 import { badInput, unauthenticated } from "../auth/errors";
 import { User } from "../entities/User";
 import { UserRepository } from "../repositories/UserRepository";
+import { QueryFailedError } from "typeorm";
+
+const dummyPasswordHash = "$2b$12$I8uZdzOd8gXhXBDiXzwqr.LPaalfXx8uEYSyTARWywcNI.7zbTuDu";
 
 export type AuthResult = {
   token: string;
@@ -22,19 +25,27 @@ export class AuthService {
       throw badInput("Email already registered");
     }
 
-    const user = await this.users.create(
-      normalizedEmail,
-      normalizedName,
-      await hashPassword(password),
-    );
+    let user: User;
+
+    try {
+      user = await this.users.create(normalizedEmail, normalizedName, await hashPassword(password));
+    } catch (error) {
+      if (error instanceof QueryFailedError && error.driverError?.code === "23505") {
+        throw badInput("Email already registered");
+      }
+
+      throw error;
+    }
 
     return { token: signAccessToken(user.id), user };
   }
 
   async login(email: string, password: string): Promise<AuthResult> {
     const user = await this.users.findByEmail(this.normalizeEmail(email));
+    const passwordHash = user?.passwordHash ?? dummyPasswordHash;
+    const passwordMatches = await verifyPassword(password, passwordHash);
 
-    if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    if (!user || !passwordMatches) {
       throw unauthenticated("Invalid email or password");
     }
 
@@ -50,8 +61,21 @@ export class AuthService {
   }
 
   private validateCredentials(email: string, name: string, password: string): void {
-    if (!email || !name || password.length < 8) {
-      throw badInput("Email, name, and a password of at least 8 characters are required");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordByteLength = Buffer.byteLength(password, "utf8");
+
+    if (
+      !email ||
+      email.length > 254 ||
+      !emailPattern.test(email) ||
+      !name ||
+      name.length > 100 ||
+      password.length < 8 ||
+      passwordByteLength > 72
+    ) {
+      throw badInput(
+        "Use a valid email, a name up to 100 characters, and a password between 8 and 72 bytes",
+      );
     }
   }
 }

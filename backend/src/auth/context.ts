@@ -1,6 +1,6 @@
 import type { Request } from "express";
 import { verifyAccessToken } from "./jwt";
-import { InvalidAccessTokenError, unauthenticated } from "./errors";
+import { InvalidAccessTokenError } from "./errors";
 
 export type GraphQLContext = {
   userId?: string;
@@ -16,14 +16,14 @@ export function createContext(request: Request): GraphQLContext {
   const [scheme, token] = authorization.split(" ");
 
   if (scheme !== "Bearer" || !token) {
-    throw new Error("Invalid authorization header");
+    return {};
   }
 
   try {
     return { userId: verifyAccessToken(token) };
   } catch (error) {
     if (error instanceof InvalidAccessTokenError) {
-      throw unauthenticated("Invalid access token");
+      return {};
     }
 
     throw error;

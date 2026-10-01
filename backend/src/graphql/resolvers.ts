@@ -1,4 +1,5 @@
 import { type GraphQLContext } from "../auth/context";
+import { unauthenticated } from "../auth/errors";
 import { Project } from "../entities/Project";
 import { Task } from "../entities/Task";
 import { User } from "../entities/User";
@@ -12,14 +13,31 @@ const projectService = new ProjectService();
 const taskService = new TaskService();
 const userService = new UserService();
 
+function requireUserId(context: GraphQLContext): string {
+  if (!context.userId) {
+    throw unauthenticated("Login required");
+  }
+
+  return context.userId;
+}
+
 export const resolvers = {
   Query: {
     health: () => "ok",
     me: (_parent: unknown, _args: unknown, context: GraphQLContext) =>
-      context.userId ? authService.findCurrentUser(context.userId) : null,
-    users: () => userService.listUsers(),
-    projects: () => projectService.listProjects(),
-    tasks: () => taskService.listTasks(),
+      authService.findCurrentUser(requireUserId(context)),
+    users: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      requireUserId(context);
+      return userService.listUsers();
+    },
+    projects: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      requireUserId(context);
+      return projectService.listProjects();
+    },
+    tasks: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      requireUserId(context);
+      return taskService.listTasks();
+    },
   },
   Mutation: {
     register: (

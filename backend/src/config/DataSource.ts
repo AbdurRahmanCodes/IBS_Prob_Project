@@ -6,7 +6,8 @@ import { Project } from "../entities/Project";
 import { Task } from "../entities/Task";
 import { CreateUser1790748664766 } from "../migrations/1790748664766-CreateUser";
 import { CreateProjectAndTask1790764874290 } from "../migrations/1790764874290-CreateProjectAndTask";
-const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME", "JWT_SECRET"];
+
+const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"];
 
 for (const key of requiredEnvVars) {
   if (!process.env[key]) {
