@@ -1,5 +1,6 @@
 import { Task } from "../entities/Task";
 import { AppDataSource } from "../config/DataSource";
+import { publicUserSelect } from "./UserRepository";
 
 export class TaskRepository {
   async findAll(): Promise<Task[]> {
@@ -17,11 +18,12 @@ export class TaskRepository {
           name: true,
           description: true,
           createdAt: true,
-          owner: { id: true, email: true, name: true, createdAt: true },
+          owner: publicUserSelect,
         },
-        assignee: { id: true, email: true, name: true, createdAt: true },
+        assignee: publicUserSelect,
       },
       relations: { project: { owner: true }, assignee: true },
+      take: 100,
       order: { createdAt: "ASC" },
     });
   }

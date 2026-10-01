@@ -1,5 +1,6 @@
 import { Project } from "../entities/Project";
 import { AppDataSource } from "../config/DataSource";
+import { publicUserSelect } from "./UserRepository";
 
 export class ProjectRepository {
   async findAll(): Promise<Project[]> {
@@ -9,9 +10,10 @@ export class ProjectRepository {
         name: true,
         description: true,
         createdAt: true,
-        owner: { id: true, email: true, name: true, createdAt: true },
+        owner: publicUserSelect,
       },
       relations: { owner: true },
+      take: 100,
       order: { createdAt: "ASC" },
     });
   }
