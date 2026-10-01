@@ -9,6 +9,7 @@ import { resolvers } from "./graphql/resolvers";
 import { typeDefs } from "./graphql/schema";
 
 const port = Number(process.env.PORT ?? 4000);
+const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:3000";
 
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error("PORT must be an integer between 1 and 65535");
@@ -37,7 +38,12 @@ async function main() {
     response.status(200).json({ status: "ok" });
   });
 
-  app.use("/graphql", cors(), express.json(), expressMiddleware(apolloServer));
+  app.use(
+    "/graphql",
+    cors({ origin: frontendUrl }),
+    express.json(),
+    expressMiddleware(apolloServer),
+  );
 
   app.use(
     (
@@ -51,7 +57,18 @@ async function main() {
         return;
       }
 
-      response.status(400).json({ error: "Invalid request body" });
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "type" in error &&
+        error.type === "entity.parse.failed"
+      ) {
+        response.status(400).json({ error: "Invalid request body" });
+        return;
+      }
+
+      console.error("HTTP request error:", error);
+      response.status(500).json({ error: "Internal server error" });
     },
   );
 
