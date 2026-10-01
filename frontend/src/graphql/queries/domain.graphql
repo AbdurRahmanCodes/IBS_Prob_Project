@@ -1,0 +1,30 @@
+query DomainData {
+  users {
+    id
+    name
+    createdAt
+  }
+  projects {
+    id
+    name
+    description
+    owner {
+      id
+      name
+    }
+  }
+  tasks {
+    id
+    title
+    status
+    priority
+    project {
+      id
+      name
+    }
+    assignee {
+      id
+      name
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import ApolloProvider from "@/providers/ApolloProvider";
 import ThemeProvider from "@/providers/ThemeProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <AppRouterCacheProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ApolloProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </ApolloProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
