@@ -1,11 +1,12 @@
-// Load .env here so the TypeORM CLI (migrations) also gets the DB settings
-import "dotenv/config";
+// Load and validate shared environment configuration for the TypeORM CLI.
+import "./env";
 import { DataSource } from "typeorm";
 import { User } from "../entities/User";
 import { Project } from "../entities/Project";
 import { Task } from "../entities/Task";
 import { CreateUser1790748664766 } from "../migrations/1790748664766-CreateUser";
 import { CreateProjectAndTask1790764874290 } from "../migrations/1790764874290-CreateProjectAndTask";
+
 const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"];
 
 for (const key of requiredEnvVars) {

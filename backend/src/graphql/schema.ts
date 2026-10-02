@@ -11,10 +11,26 @@ export const typeDefs = `#graphql
     HIGH
   }
 
+  input RegisterInput {
+    email: String!
+    name: String!
+    password: String!
+  }
+
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
   type User {
     id: ID!
     name: String!
     createdAt: String!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
   }
 
   type Project {
@@ -39,8 +55,14 @@ export const typeDefs = `#graphql
 
   type Query {
     health: String!
+    me: User
     users: [User!]!
     projects: [Project!]!
     tasks: [Task!]!
+  }
+
+  type Mutation {
+    register(input: RegisterInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
   }
 `;
