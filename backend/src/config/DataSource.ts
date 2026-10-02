@@ -1,5 +1,5 @@
-// Load .env here so the TypeORM CLI (migrations) also gets the DB settings
-import "dotenv/config";
+// Load and validate shared environment configuration for the TypeORM CLI.
+import "./env";
 import { DataSource } from "typeorm";
 import { User } from "../entities/User";
 import { Project } from "../entities/Project";
