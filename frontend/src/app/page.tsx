@@ -1,5 +1,4 @@
 import { Button, Typography, Container } from "@mui/material";
-import DomainPreview from "@/components/DomainPreview";
 
 export default function Home() {
   return (
@@ -8,7 +7,6 @@ export default function Home() {
         Task Board
       </Typography>
       <Button variant="contained">Hello MUI</Button>
-      <DomainPreview />
     </Container>
   );
 }

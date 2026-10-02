@@ -2,10 +2,10 @@
 
 import { useQuery } from "@apollo/client/react";
 import { Alert, CircularProgress, Stack, Typography } from "@mui/material";
-import { DomainDataDocument, type DomainDataQuery } from "@/graphql/generated/graphql";
+import { DomainDataDocument } from "@/graphql/generated/graphql";
 
 export default function DomainPreview() {
-  const { data, loading, error } = useQuery<DomainDataQuery>(DomainDataDocument);
+  const { data, loading, error } = useQuery(DomainDataDocument);
 
   if (loading) {
     return <CircularProgress aria-label="Loading task board data" />;

@@ -48,15 +48,6 @@ importers:
       '@graphql-codegen/client-preset':
         specifier: ^6.2.0
         version: 6.2.0(graphql@17.0.2)
-      '@graphql-codegen/typed-document-node':
-        specifier: ^7.1.1
-        version: 7.1.1(graphql@17.0.2)
-      '@graphql-codegen/typescript':
-        specifier: ^6.1.0
-        version: 6.1.0(graphql@17.0.2)
-      '@graphql-codegen/typescript-operations':
-        specifier: ^6.1.9
-        version: 6.1.9(graphql@17.0.2)
       '@types/node':
         specifier: ^20
         version: 20.19.43
