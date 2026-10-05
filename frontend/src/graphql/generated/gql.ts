@@ -14,9 +14,12 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+  "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}": typeof types.LoginDocument;
   "query DomainData {\n  users {\n    id\n    name\n    createdAt\n  }\n  projects {\n    id\n    name\n    description\n    owner {\n      id\n      name\n    }\n  }\n  tasks {\n    id\n    title\n    status\n    priority\n    project {\n      id\n      name\n    }\n    assignee {\n      id\n      name\n    }\n  }\n}": typeof types.DomainDataDocument;
 };
 const documents: Documents = {
+  "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}":
+    types.LoginDocument,
   "query DomainData {\n  users {\n    id\n    name\n    createdAt\n  }\n  projects {\n    id\n    name\n    description\n    owner {\n      id\n      name\n    }\n  }\n  tasks {\n    id\n    title\n    status\n    priority\n    project {\n      id\n      name\n    }\n    assignee {\n      id\n      name\n    }\n  }\n}":
     types.DomainDataDocument,
 };
@@ -35,6 +38,12 @@ const documents: Documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}",
+): (typeof documents)["mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
