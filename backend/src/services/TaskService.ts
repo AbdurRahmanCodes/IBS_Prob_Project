@@ -146,4 +146,19 @@ export class TaskService {
 
     return this.repository.update(id, updateData);
   }
+
+  async deleteTask(id: string, userId: string): Promise<string> {
+    const task = await this.repository.findById(id);
+
+    if (!task) {
+      throw badInput("Task not found");
+    }
+
+    if (task.project.owner.id !== userId) {
+      throw forbidden("You do not have permission to delete this task");
+    }
+
+    await this.repository.delete(id);
+    return id;
+  }
 }
