@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import {
   Alert,
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -16,10 +15,11 @@ import {
 import {
   CreateTaskDocument,
   GetTasksDocument,
-  GetProjectsQuery,
-  TaskPriority,
-  TaskStatus,
+  type GetProjectsQuery,
+  type TaskPriority,
+  type TaskStatus,
 } from "@/graphql/generated/graphql";
+import TaskFormFields from "./TaskFormFields";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -39,7 +39,6 @@ export default function CreateTaskDialog({ open, onClose, projects }: CreateTask
     refetchQueries: [{ query: GetTasksDocument }],
   });
 
-  // Derive the active project ID during render (eliminates a useEffect)
   const activeProjectId = projectId || (projects[0]?.id ?? "");
 
   function handleClose() {
@@ -104,48 +103,16 @@ export default function CreateTaskDialog({ open, onClose, projects }: CreateTask
               </MenuItem>
             )}
           </TextField>
-          <TextField
-            autoFocus
-            fullWidth
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            margin="normal"
-            required
+          <TaskFormFields
+            title={title}
+            onTitleChange={setTitle}
+            description={description}
+            onDescriptionChange={setDescription}
+            status={status}
+            onStatusChange={setStatus}
+            priority={priority}
+            onPriorityChange={setPriority}
           />
-          <TextField
-            fullWidth
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            margin="normal"
-            multiline
-            rows={3}
-          />
-          <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-            <TextField
-              select
-              fullWidth
-              label="Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as TaskStatus)}
-            >
-              <MenuItem value="TODO">To Do</MenuItem>
-              <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
-              <MenuItem value="DONE">Done</MenuItem>
-            </TextField>
-            <TextField
-              select
-              fullWidth
-              label="Priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as TaskPriority)}
-            >
-              <MenuItem value="LOW">Low</MenuItem>
-              <MenuItem value="MEDIUM">Medium</MenuItem>
-              <MenuItem value="HIGH">High</MenuItem>
-            </TextField>
-          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

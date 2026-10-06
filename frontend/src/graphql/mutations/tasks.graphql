@@ -15,3 +15,14 @@ mutation CreateProject($input: CreateProjectInput!) {
     name
   }
 }
+
+mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
+  updateTask(id: $id, input: $input) {
+    id
+    title
+    description
+    status
+    priority
+    createdAt
+  }
+}

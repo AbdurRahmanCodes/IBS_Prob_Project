@@ -27,17 +27,18 @@ export type TaskPriority = "HIGH" | "LOW" | "MEDIUM";
 
 export type TaskStatus = "DONE" | "IN_PROGRESS" | "TODO";
 
+export type UpdateTaskInput = {
+  description?: string | null | undefined;
+  priority?: TaskPriority | null | undefined;
+  status?: TaskStatus | null | undefined;
+  title?: string | null | undefined;
+};
+
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 export type LoginMutation = { login: { token: string; user: { id: string; name: string } } };
-
-export type CreateProjectMutationVariables = Exact<{
-  input: CreateProjectInput;
-}>;
-
-export type CreateProjectMutation = { createProject: { id: string; name: string } };
 
 export type CreateTaskMutationVariables = Exact<{
   input: CreateTaskInput;
@@ -45,6 +46,28 @@ export type CreateTaskMutationVariables = Exact<{
 
 export type CreateTaskMutation = {
   createTask: {
+    id: string;
+    title: string;
+    description: string | null;
+    status: TaskStatus;
+    priority: TaskPriority;
+    createdAt: string;
+  };
+};
+
+export type CreateProjectMutationVariables = Exact<{
+  input: CreateProjectInput;
+}>;
+
+export type CreateProjectMutation = { createProject: { id: string; name: string } };
+
+export type UpdateTaskMutationVariables = Exact<{
+  id: string | number;
+  input: UpdateTaskInput;
+}>;
+
+export type UpdateTaskMutation = {
+  updateTask: {
     id: string;
     title: string;
     description: string | null;
@@ -74,10 +97,6 @@ export type DomainDataQuery = {
   }>;
 };
 
-export type GetProjectsQueryVariables = Exact<{ [key: string]: never }>;
-
-export type GetProjectsQuery = { projects: Array<{ id: string; name: string }> };
-
 export type GetTasksQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetTasksQuery = {
@@ -90,6 +109,10 @@ export type GetTasksQuery = {
     createdAt: string;
   }>;
 };
+
+export type GetProjectsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetProjectsQuery = { projects: Array<{ id: string; name: string }> };
 
 export const LoginDocument = {
   kind: "Document",
@@ -144,49 +167,6 @@ export const LoginDocument = {
     },
   ],
 } as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
-export const CreateProjectDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "CreateProject" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "CreateProjectInput" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "createProject" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CreateProjectMutation, CreateProjectMutationVariables>;
 export const CreateTaskDocument = {
   kind: "Document",
   definitions: [
@@ -234,6 +214,109 @@ export const CreateTaskDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateTaskMutation, CreateTaskMutationVariables>;
+export const CreateProjectDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateProject" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "CreateProjectInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "createProject" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateProjectMutation, CreateProjectMutationVariables>;
+export const UpdateTaskDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateTask" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UpdateTaskInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateTask" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "description" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "priority" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateTaskMutation, UpdateTaskMutationVariables>;
 export const DomainDataDocument = {
   kind: "Document",
   definitions: [
@@ -319,32 +402,6 @@ export const DomainDataDocument = {
     },
   ],
 } as unknown as DocumentNode<DomainDataQuery, DomainDataQueryVariables>;
-export const GetProjectsDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "GetProjects" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "projects" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetProjectsQuery, GetProjectsQueryVariables>;
 export const GetTasksDocument = {
   kind: "Document",
   definitions: [
@@ -375,3 +432,29 @@ export const GetTasksDocument = {
     },
   ],
 } as unknown as DocumentNode<GetTasksQuery, GetTasksQueryVariables>;
+export const GetProjectsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetProjects" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "projects" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetProjectsQuery, GetProjectsQueryVariables>;

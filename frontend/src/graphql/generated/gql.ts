@@ -15,23 +15,18 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
  */
 type Documents = {
   "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}": typeof types.LoginDocument;
-  "mutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}": typeof types.CreateProjectDocument;
-  "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}": typeof types.CreateTaskDocument;
+  "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}": typeof types.CreateTaskDocument;
   "query DomainData {\n  users {\n    id\n    name\n    createdAt\n  }\n  projects {\n    id\n    name\n    description\n    owner {\n      id\n      name\n    }\n  }\n  tasks {\n    id\n    title\n    status\n    priority\n    project {\n      id\n      name\n    }\n    assignee {\n      id\n      name\n    }\n  }\n}": typeof types.DomainDataDocument;
-  "query GetProjects {\n  projects {\n    id\n    name\n  }\n}": typeof types.GetProjectsDocument;
-  "query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}": typeof types.GetTasksDocument;
+  "query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nquery GetProjects {\n  projects {\n    id\n    name\n  }\n}": typeof types.GetTasksDocument;
 };
 const documents: Documents = {
   "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}":
     types.LoginDocument,
-  "mutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}":
-    types.CreateProjectDocument,
-  "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}":
+  "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}":
     types.CreateTaskDocument,
   "query DomainData {\n  users {\n    id\n    name\n    createdAt\n  }\n  projects {\n    id\n    name\n    description\n    owner {\n      id\n      name\n    }\n  }\n  tasks {\n    id\n    title\n    status\n    priority\n    project {\n      id\n      name\n    }\n    assignee {\n      id\n      name\n    }\n  }\n}":
     types.DomainDataDocument,
-  "query GetProjects {\n  projects {\n    id\n    name\n  }\n}": types.GetProjectsDocument,
-  "query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}":
+  "query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nquery GetProjects {\n  projects {\n    id\n    name\n  }\n}":
     types.GetTasksDocument,
 };
 
@@ -59,14 +54,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "mutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}",
-): (typeof documents)["mutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}",
-): (typeof documents)["mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}"];
+  source: "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}",
+): (typeof documents)["mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -77,14 +66,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "query GetProjects {\n  projects {\n    id\n    name\n  }\n}",
-): (typeof documents)["query GetProjects {\n  projects {\n    id\n    name\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}",
-): (typeof documents)["query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}"];
+  source: "query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nquery GetProjects {\n  projects {\n    id\n    name\n  }\n}",
+): (typeof documents)["query GetTasks {\n  tasks {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nquery GetProjects {\n  projects {\n    id\n    name\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

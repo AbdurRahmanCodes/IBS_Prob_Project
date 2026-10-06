@@ -11,6 +11,15 @@ export interface CreateTaskData {
   project: { id: string };
 }
 
+export interface UpdateTaskData {
+  title?: string;
+  description?: string | null;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+}
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export class TaskRepository {
   async findAll(): Promise<Task[]> {
     return AppDataSource.getRepository(Task).find({
@@ -47,13 +56,39 @@ export class TaskRepository {
       project: data.project,
     });
     const saved = await repo.save(task);
+    return (await this.findById(saved.id))!;
+  }
 
-    // Re-fetch with full relations so resolvers get project { name, owner } etc.
-    const full = await repo.findOne({
-      where: { id: saved.id },
+  async findById(id: string): Promise<Task | null> {
+    if (!UUID_REGEX.test(id)) {
+      return null;
+    }
+    return AppDataSource.getRepository(Task).findOne({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        createdAt: true,
+        project: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          owner: publicUserSelect,
+        },
+        assignee: publicUserSelect,
+      },
       relations: { project: { owner: true }, assignee: true },
     });
+  }
 
-    return full!;
+  async update(id: string, data: UpdateTaskData): Promise<Task> {
+    await AppDataSource.getRepository(Task).update(id, data);
+    const updated = await this.findById(id);
+    return updated!;
   }
 }
