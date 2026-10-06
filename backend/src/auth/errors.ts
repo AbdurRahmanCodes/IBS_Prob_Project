@@ -13,3 +13,9 @@ export function badInput(message: string): GraphQLError {
     extensions: { code: "BAD_USER_INPUT" },
   });
 }
+
+export function forbidden(message: string): GraphQLError {
+  return new GraphQLError(message, {
+    extensions: { code: "FORBIDDEN" },
+  });
+}

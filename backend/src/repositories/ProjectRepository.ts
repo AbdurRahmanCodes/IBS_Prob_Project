@@ -8,6 +8,8 @@ export interface CreateProjectData {
   owner: { id: string };
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export class ProjectRepository {
   async findAll(): Promise<Project[]> {
     return AppDataSource.getRepository(Project).find({
@@ -25,6 +27,9 @@ export class ProjectRepository {
   }
 
   async findByIdAndOwner(id: string, ownerId: string): Promise<Project | null> {
+    if (!UUID_REGEX.test(id) || !UUID_REGEX.test(ownerId)) {
+      return null;
+    }
     return AppDataSource.getRepository(Project).findOne({
       where: { id, owner: { id: ownerId } },
       relations: { owner: true },

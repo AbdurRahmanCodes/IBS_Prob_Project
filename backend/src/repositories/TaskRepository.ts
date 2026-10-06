@@ -18,6 +18,8 @@ export interface UpdateTaskData {
   priority?: TaskPriority;
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export class TaskRepository {
   async findAll(): Promise<Task[]> {
     return AppDataSource.getRepository(Task).find({
@@ -54,32 +56,38 @@ export class TaskRepository {
       project: data.project,
     });
     const saved = await repo.save(task);
-
-    // Re-fetch with full relations so resolvers get project { name, owner } etc.
-    const full = await repo.findOne({
-      where: { id: saved.id },
-      relations: { project: { owner: true }, assignee: true },
-    });
-
-    return full!;
+    return (await this.findById(saved.id))!;
   }
 
   async findById(id: string): Promise<Task | null> {
+    if (!UUID_REGEX.test(id)) {
+      return null;
+    }
     return AppDataSource.getRepository(Task).findOne({
       where: { id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        createdAt: true,
+        project: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          owner: publicUserSelect,
+        },
+        assignee: publicUserSelect,
+      },
       relations: { project: { owner: true }, assignee: true },
     });
   }
 
   async update(id: string, data: UpdateTaskData): Promise<Task> {
-    const repo = AppDataSource.getRepository(Task);
-    const updatePayload: Partial<Task> = {};
-    if (data.title !== undefined) updatePayload.title = data.title;
-    if (data.description !== undefined) updatePayload.description = data.description;
-    if (data.status !== undefined) updatePayload.status = data.status;
-    if (data.priority !== undefined) updatePayload.priority = data.priority;
-
-    await repo.update(id, updatePayload);
+    await AppDataSource.getRepository(Task).update(id, data);
     const updated = await this.findById(id);
     return updated!;
   }
