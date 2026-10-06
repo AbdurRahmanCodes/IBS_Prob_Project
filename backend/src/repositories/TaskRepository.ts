@@ -91,11 +91,10 @@ export class TaskRepository {
     return updated!;
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: string): Promise<void> {
     if (!UUID_REGEX.test(id)) {
-      return false;
+      return;
     }
-    const result = await AppDataSource.getRepository(Task).delete(id);
-    return Boolean(result.affected && result.affected > 0);
+    await AppDataSource.getRepository(Task).delete(id);
   }
 }

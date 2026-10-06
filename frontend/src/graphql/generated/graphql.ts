@@ -114,6 +114,7 @@ export type GetTasksQuery = {
       status: TaskStatus;
       priority: TaskPriority;
       createdAt: string;
+      project: { id: string; owner: { id: string } };
     }>;
   };
 };
@@ -483,6 +484,26 @@ export const GetTasksDocument = {
                       { kind: "Field", name: { kind: "Name", value: "status" } },
                       { kind: "Field", name: { kind: "Name", value: "priority" } },
                       { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "project" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "owner" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },

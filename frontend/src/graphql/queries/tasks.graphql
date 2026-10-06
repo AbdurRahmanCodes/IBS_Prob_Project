@@ -7,6 +7,12 @@ query GetTasks($page: Int, $pageSize: Int) {
       status
       priority
       createdAt
+      project {
+        id
+        owner {
+          id
+        }
+      }
     }
     totalCount
     page

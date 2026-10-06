@@ -93,7 +93,7 @@ export class TaskService {
     });
   }
 
-  async updateTask(id: string, input: UpdateTaskInput, userId: string): Promise<Task> {
+  private async findTaskAndCheckOwnership(id: string, userId: string): Promise<Task> {
     const task = await this.repository.findById(id);
 
     if (!task) {
@@ -103,6 +103,12 @@ export class TaskService {
     if (task.project.owner.id !== userId) {
       throw forbidden("You do not have permission to modify this task");
     }
+
+    return task;
+  }
+
+  async updateTask(id: string, input: UpdateTaskInput, userId: string): Promise<Task> {
+    const task = await this.findTaskAndCheckOwnership(id, userId);
 
     if (
       input.title === undefined &&
@@ -148,16 +154,7 @@ export class TaskService {
   }
 
   async deleteTask(id: string, userId: string): Promise<string> {
-    const task = await this.repository.findById(id);
-
-    if (!task) {
-      throw badInput("Task not found");
-    }
-
-    if (task.project.owner.id !== userId) {
-      throw forbidden("You do not have permission to delete this task");
-    }
-
+    await this.findTaskAndCheckOwnership(id, userId);
     await this.repository.delete(id);
     return id;
   }

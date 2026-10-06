@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import {
   CreateTaskDocument,
-  GetTasksDocument,
   type GetProjectsQuery,
   type TaskPriority,
   type TaskStatus,
@@ -46,7 +45,6 @@ export default function CreateTaskDialog({
       cache.evict({ fieldName: "tasks" });
       cache.gc();
     },
-    refetchQueries: [{ query: GetTasksDocument }],
   });
 
   const activeProjectId = projectId || (projects[0]?.id ?? "");
