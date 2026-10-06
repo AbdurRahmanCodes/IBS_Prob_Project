@@ -11,6 +11,19 @@ export const typeDefs = `#graphql
     HIGH
   }
 
+  input CreateTaskInput {
+    title: String!
+    description: String
+    status: TaskStatus!
+    priority: TaskPriority!
+    projectId: ID!
+  }
+
+  input CreateProjectInput {
+    name: String!
+    description: String
+  }
+
   input RegisterInput {
     email: String!
     name: String!
@@ -64,5 +77,7 @@ export const typeDefs = `#graphql
   type Mutation {
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
+    createTask(input: CreateTaskInput!): Task!
+    createProject(input: CreateProjectInput!): Project!
   }
 `;

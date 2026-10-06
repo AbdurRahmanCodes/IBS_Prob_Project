@@ -23,7 +23,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         clearAuth();
         router.replace("/login");
       }
-    } catch (error) {
+    } catch {
       clearAuth();
       router.replace("/login");
     }
