@@ -18,9 +18,46 @@ export interface UpdateTaskData {
   priority?: TaskPriority;
 }
 
+export interface FindPaginatedTasksOptions {
+  skip: number;
+  take: number;
+}
+
+export interface PaginatedTasksResult {
+  items: Task[];
+  totalCount: number;
+}
+
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export class TaskRepository {
+  async findPaginated(options: FindPaginatedTasksOptions): Promise<PaginatedTasksResult> {
+    const [items, totalCount] = await AppDataSource.getRepository(Task).findAndCount({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        createdAt: true,
+        project: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          owner: publicUserSelect,
+        },
+        assignee: publicUserSelect,
+      },
+      relations: { project: { owner: true }, assignee: true },
+      skip: options.skip,
+      take: options.take,
+      order: { createdAt: "ASC" },
+    });
+
+    return { items, totalCount };
+  }
   async findAll(): Promise<Task[]> {
     return AppDataSource.getRepository(Task).find({
       select: {
