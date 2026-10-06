@@ -1,5 +1,6 @@
 import { type GraphQLContext } from "../auth/context";
 import { unauthenticated } from "../auth/errors";
+import { TaskStatus, TaskPriority } from "../entities/Task";
 import { Project } from "../entities/Project";
 import { Task } from "../entities/Task";
 import { User } from "../entities/User";
@@ -7,6 +8,8 @@ import { AuthService } from "../services/AuthService";
 import { ProjectService } from "../services/ProjectService";
 import { TaskService } from "../services/TaskService";
 import { UserService } from "../services/UserService";
+import type { CreateProjectInput } from "../services/ProjectService";
+import type { CreateTaskInput } from "../services/TaskService";
 
 const authService = new AuthService();
 const projectService = new ProjectService();
@@ -46,6 +49,22 @@ export const resolvers = {
     ) => authService.register(input.email, input.name, input.password),
     login: (_parent: unknown, { input }: { input: { email: string; password: string } }) =>
       authService.login(input.email, input.password),
+    createTask: (
+      _parent: unknown,
+      { input }: { input: CreateTaskInput },
+      context: GraphQLContext,
+    ) => {
+      const userId = requireUserId(context);
+      return taskService.createTask(input, userId);
+    },
+    createProject: (
+      _parent: unknown,
+      { input }: { input: CreateProjectInput },
+      context: GraphQLContext,
+    ) => {
+      const userId = requireUserId(context);
+      return projectService.createProject(input, userId);
+    },
   },
   User: {
     createdAt: (user: User) => user.createdAt.toISOString(),
