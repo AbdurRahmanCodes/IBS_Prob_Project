@@ -87,17 +87,7 @@ export type DomainDataQuery = {
     description: string | null;
     owner: { id: string; name: string };
   }>;
-  tasks: {
-    totalCount: number;
-    items: Array<{
-      id: string;
-      title: string;
-      status: TaskStatus;
-      priority: TaskPriority;
-      project: { id: string; name: string };
-      assignee: { id: string; name: string } | null;
-    }>;
-  };
+  tasks: { totalCount: number };
 };
 
 export type GetTasksQueryVariables = Exact<{
@@ -386,49 +376,12 @@ export const DomainDataDocument = {
               {
                 kind: "Argument",
                 name: { kind: "Name", value: "pageSize" },
-                value: { kind: "IntValue", value: "100" },
+                value: { kind: "IntValue", value: "1" },
               },
             ],
             selectionSet: {
               kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "items" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "title" } },
-                      { kind: "Field", name: { kind: "Name", value: "status" } },
-                      { kind: "Field", name: { kind: "Name", value: "priority" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "project" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "name" } },
-                          ],
-                        },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "assignee" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "name" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "totalCount" } },
-              ],
+              selections: [{ kind: "Field", name: { kind: "Name", value: "totalCount" } }],
             },
           },
         ],

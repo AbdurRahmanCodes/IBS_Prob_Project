@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import {
   CreateTaskDocument,
+  GetTasksDocument,
   type GetProjectsQuery,
   type TaskPriority,
   type TaskStatus,
@@ -24,9 +25,15 @@ interface CreateTaskDialogProps {
   open: boolean;
   onClose: () => void;
   projects: GetProjectsQuery["projects"];
+  onSuccess?: () => void;
 }
 
-export default function CreateTaskDialog({ open, onClose, projects }: CreateTaskDialogProps) {
+export default function CreateTaskDialog({
+  open,
+  onClose,
+  projects,
+  onSuccess,
+}: CreateTaskDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<TaskStatus>("TODO");
@@ -35,7 +42,11 @@ export default function CreateTaskDialog({ open, onClose, projects }: CreateTask
   const [mutationError, setMutationError] = useState("");
 
   const [createTask, { loading: creating }] = useMutation(CreateTaskDocument, {
-    refetchQueries: ["GetTasks"],
+    update(cache) {
+      cache.evict({ fieldName: "tasks" });
+      cache.gc();
+    },
+    refetchQueries: [{ query: GetTasksDocument }],
   });
 
   const activeProjectId = projectId || (projects[0]?.id ?? "");
@@ -66,6 +77,7 @@ export default function CreateTaskDialog({ open, onClose, projects }: CreateTask
           },
         },
       });
+      onSuccess?.();
       handleClose();
     } catch (err) {
       setMutationError(err instanceof Error ? err.message : "Failed to create task");

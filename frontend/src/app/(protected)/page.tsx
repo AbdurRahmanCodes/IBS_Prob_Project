@@ -17,13 +17,10 @@ import {
   CreateProjectDocument,
   GetProjectsDocument,
   GetTasksDocument,
-  type GetTasksQuery,
 } from "@/graphql/generated/graphql";
-import TaskCard from "@/components/task-board/TaskCard";
+import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
 import EditTaskDialog from "@/components/task-board/EditTaskDialog";
-
-type TaskItem = GetTasksQuery["tasks"]["items"][number];
 
 const PAGE_SIZE = 6;
 
@@ -40,6 +37,7 @@ export default function DashboardPage() {
     data: tasksData,
     loading: loadingTasks,
     error: tasksError,
+    previousData,
   } = useQuery(GetTasksDocument, {
     variables: { page, pageSize: PAGE_SIZE },
   });
@@ -55,9 +53,10 @@ export default function DashboardPage() {
   });
 
   const projects = projectsData?.projects ?? [];
-  const tasks = tasksData?.tasks.items ?? [];
-  const totalPages = tasksData?.tasks.totalPages ?? 1;
-  const totalCount = tasksData?.tasks.totalCount ?? 0;
+  const currentTasksData = tasksData ?? previousData;
+  const tasks = currentTasksData?.tasks.items ?? [];
+  const totalPages = currentTasksData?.tasks.totalPages ?? 1;
+  const totalCount = currentTasksData?.tasks.totalCount ?? 0;
 
   // Only show seed button when the query has settled with an empty result
   const showSeedButton = !loadingProjects && !projectsError && projects.length === 0;
@@ -111,14 +110,14 @@ export default function DashboardPage() {
 
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Typography variant="h5">Tasks</Typography>
-        {!loadingTasks && !tasksError && totalCount > 0 && (
+        {!tasksError && totalCount > 0 && (
           <Typography variant="body2" color="text.secondary">
             Showing {tasks.length} of {totalCount} {totalCount === 1 ? "task" : "tasks"}
           </Typography>
         )}
       </Box>
 
-      {loadingTasks && (
+      {loadingTasks && !currentTasksData && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
@@ -136,9 +135,12 @@ export default function DashboardPage() {
         </Typography>
       )}
 
-      <Grid container spacing={3}>
-        {!loadingTasks &&
-          !tasksError &&
+      <Grid
+        container
+        spacing={3}
+        sx={{ opacity: loadingTasks ? 0.6 : 1, transition: "opacity 0.2s ease" }}
+      >
+        {!tasksError &&
           tasks.map((task) => (
             <Grid size={{ xs: 12, sm: 6 }} key={task.id}>
               <TaskCard task={task} onEdit={(t) => setEditingTask(t)} />
@@ -146,7 +148,7 @@ export default function DashboardPage() {
           ))}
       </Grid>
 
-      {!loadingTasks && !tasksError && totalPages > 1 && (
+      {!tasksError && totalPages > 1 && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <Pagination
             count={totalPages}
@@ -155,6 +157,7 @@ export default function DashboardPage() {
             color="primary"
             showFirstButton
             showLastButton
+            disabled={loadingTasks}
           />
         </Box>
       )}
@@ -163,6 +166,7 @@ export default function DashboardPage() {
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         projects={projects}
+        onSuccess={() => setPage(1)}
       />
 
       <EditTaskDialog

@@ -28,59 +28,37 @@ export interface PaginatedTasksResult {
   totalCount: number;
 }
 
+export const taskSelect = {
+  id: true,
+  title: true,
+  description: true,
+  status: true,
+  priority: true,
+  dueDate: true,
+  createdAt: true,
+  project: {
+    id: true,
+    name: true,
+    description: true,
+    createdAt: true,
+    owner: publicUserSelect,
+  },
+  assignee: publicUserSelect,
+} as const;
+
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export class TaskRepository {
   async findPaginated(options: FindPaginatedTasksOptions): Promise<PaginatedTasksResult> {
     const [items, totalCount] = await AppDataSource.getRepository(Task).findAndCount({
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        createdAt: true,
-        project: {
-          id: true,
-          name: true,
-          description: true,
-          createdAt: true,
-          owner: publicUserSelect,
-        },
-        assignee: publicUserSelect,
-      },
+      select: taskSelect,
       relations: { project: { owner: true }, assignee: true },
       skip: options.skip,
       take: options.take,
-      order: { createdAt: "ASC" },
+      order: { createdAt: "DESC", id: "DESC" },
     });
 
     return { items, totalCount };
-  }
-  async findAll(): Promise<Task[]> {
-    return AppDataSource.getRepository(Task).find({
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        createdAt: true,
-        project: {
-          id: true,
-          name: true,
-          description: true,
-          createdAt: true,
-          owner: publicUserSelect,
-        },
-        assignee: publicUserSelect,
-      },
-      relations: { project: { owner: true }, assignee: true },
-      take: 100,
-      order: { createdAt: "ASC" },
-    });
   }
 
   async create(data: CreateTaskData): Promise<Task> {
@@ -102,23 +80,7 @@ export class TaskRepository {
     }
     return AppDataSource.getRepository(Task).findOne({
       where: { id },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        createdAt: true,
-        project: {
-          id: true,
-          name: true,
-          description: true,
-          createdAt: true,
-          owner: publicUserSelect,
-        },
-        assignee: publicUserSelect,
-      },
+      select: taskSelect,
       relations: { project: { owner: true }, assignee: true },
     });
   }

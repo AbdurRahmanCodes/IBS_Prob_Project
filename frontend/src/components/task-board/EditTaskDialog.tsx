@@ -5,13 +5,11 @@ import { useMutation } from "@apollo/client/react";
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import {
   UpdateTaskDocument,
-  type GetTasksQuery,
   type TaskPriority,
   type TaskStatus,
 } from "@/graphql/generated/graphql";
 import TaskFormFields from "./TaskFormFields";
-
-type TaskItem = GetTasksQuery["tasks"]["items"][number];
+import { type TaskItem } from "./TaskCard";
 
 interface EditTaskDialogProps {
   open: boolean;
