@@ -12,6 +12,13 @@ export interface CreateTaskInput {
   projectId: string;
 }
 
+export interface UpdateTaskInput {
+  title?: string;
+  description?: string | null;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+}
+
 export class TaskService {
   constructor(
     private readonly repository = new TaskRepository(),
@@ -42,5 +49,41 @@ export class TaskService {
       priority: input.priority,
       project: { id: project.id },
     });
+  }
+
+  async updateTask(id: string, input: UpdateTaskInput, userId: string): Promise<Task> {
+    const task = await this.repository.findById(id);
+
+    if (!task) {
+      throw badInput("Task not found");
+    }
+
+    if (task.project.owner.id !== userId) {
+      throw badInput("You do not have permission to modify this task");
+    }
+
+    const updateData: UpdateTaskInput = {};
+
+    if (input.title !== undefined) {
+      const normalizedTitle = input.title.trim();
+      if (!normalizedTitle) {
+        throw badInput("Task title must not be empty");
+      }
+      updateData.title = normalizedTitle;
+    }
+
+    if (input.description !== undefined) {
+      updateData.description = input.description;
+    }
+
+    if (input.status !== undefined) {
+      updateData.status = input.status;
+    }
+
+    if (input.priority !== undefined) {
+      updateData.priority = input.priority;
+    }
+
+    return this.repository.update(id, updateData);
   }
 }

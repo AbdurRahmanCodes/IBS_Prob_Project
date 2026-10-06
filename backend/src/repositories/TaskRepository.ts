@@ -11,6 +11,13 @@ export interface CreateTaskData {
   project: { id: string };
 }
 
+export interface UpdateTaskData {
+  title?: string;
+  description?: string | null;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+}
+
 export class TaskRepository {
   async findAll(): Promise<Task[]> {
     return AppDataSource.getRepository(Task).find({
@@ -55,5 +62,25 @@ export class TaskRepository {
     });
 
     return full!;
+  }
+
+  async findById(id: string): Promise<Task | null> {
+    return AppDataSource.getRepository(Task).findOne({
+      where: { id },
+      relations: { project: { owner: true }, assignee: true },
+    });
+  }
+
+  async update(id: string, data: UpdateTaskData): Promise<Task> {
+    const repo = AppDataSource.getRepository(Task);
+    const updatePayload: Partial<Task> = {};
+    if (data.title !== undefined) updatePayload.title = data.title;
+    if (data.description !== undefined) updatePayload.description = data.description;
+    if (data.status !== undefined) updatePayload.status = data.status;
+    if (data.priority !== undefined) updatePayload.priority = data.priority;
+
+    await repo.update(id, updatePayload);
+    const updated = await this.findById(id);
+    return updated!;
   }
 }

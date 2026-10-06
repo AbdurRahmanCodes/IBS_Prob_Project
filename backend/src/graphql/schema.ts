@@ -19,6 +19,13 @@ export const typeDefs = `#graphql
     projectId: ID!
   }
 
+  input UpdateTaskInput {
+    title: String
+    description: String
+    status: TaskStatus
+    priority: TaskPriority
+  }
+
   input CreateProjectInput {
     name: String!
     description: String
@@ -78,6 +85,7 @@ export const typeDefs = `#graphql
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
     createTask(input: CreateTaskInput!): Task!
+    updateTask(id: ID!, input: UpdateTaskInput!): Task!
     createProject(input: CreateProjectInput!): Project!
   }
 `;

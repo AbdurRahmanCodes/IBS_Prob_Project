@@ -9,7 +9,7 @@ import { ProjectService } from "../services/ProjectService";
 import { TaskService } from "../services/TaskService";
 import { UserService } from "../services/UserService";
 import type { CreateProjectInput } from "../services/ProjectService";
-import type { CreateTaskInput } from "../services/TaskService";
+import type { CreateTaskInput, UpdateTaskInput } from "../services/TaskService";
 
 const authService = new AuthService();
 const projectService = new ProjectService();
@@ -56,6 +56,14 @@ export const resolvers = {
     ) => {
       const userId = requireUserId(context);
       return taskService.createTask(input, userId);
+    },
+    updateTask: (
+      _parent: unknown,
+      { id, input }: { id: string; input: UpdateTaskInput },
+      context: GraphQLContext,
+    ) => {
+      const userId = requireUserId(context);
+      return taskService.updateTask(id, input, userId);
     },
     createProject: (
       _parent: unknown,
