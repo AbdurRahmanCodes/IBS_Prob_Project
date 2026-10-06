@@ -11,12 +11,14 @@ import {
 } from "@/graphql/generated/graphql";
 import TaskCard from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
+import EditTaskDialog, { TaskToEdit } from "@/components/task-board/EditTaskDialog";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskToEdit | null>(null);
   const [seedError, setSeedError] = useState("");
 
   const { data: tasksData, loading: loadingTasks, error: tasksError } = useQuery(GetTasksDocument);
@@ -48,7 +50,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 8 }}>
+    <Container maxWidth="md" sx={{ mt: 8, mb: 8 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
         <Typography variant="h4" component="h1">
           Task Board
@@ -64,7 +66,7 @@ export default function DashboardPage() {
               {creatingProject ? "Seeding..." : "Seed Project"}
             </Button>
           )}
-          <Button variant="contained" color="primary" onClick={() => setDialogOpen(true)}>
+          <Button variant="contained" color="primary" onClick={() => setCreateDialogOpen(true)}>
             + New Task
           </Button>
           <Button variant="outlined" color="error" onClick={clearAuth}>
@@ -110,20 +112,22 @@ export default function DashboardPage() {
           !tasksError &&
           tasksData?.tasks.map((task) => (
             <Grid size={{ xs: 12, sm: 6 }} key={task.id}>
-              <TaskCard
-                title={task.title}
-                description={task.description}
-                status={task.status}
-                priority={task.priority}
-              />
+              <TaskCard task={task} onEdit={(t) => setEditingTask(t)} />
             </Grid>
           ))}
       </Grid>
 
       <CreateTaskDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
         projects={projects}
+      />
+
+      <EditTaskDialog
+        key={editingTask?.id ?? "none"}
+        open={Boolean(editingTask)}
+        onClose={() => setEditingTask(null)}
+        task={editingTask}
       />
     </Container>
   );
