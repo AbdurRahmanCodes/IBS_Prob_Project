@@ -11,7 +11,7 @@ import {
 } from "@/graphql/generated/graphql";
 import TaskFormFields from "./TaskFormFields";
 
-type TaskItem = GetTasksQuery["tasks"][number];
+type TaskItem = GetTasksQuery["tasks"]["items"][number];
 
 interface EditTaskDialogProps {
   open: boolean;

@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import {
   CreateTaskDocument,
-  GetTasksDocument,
   type GetProjectsQuery,
   type TaskPriority,
   type TaskStatus,
@@ -36,7 +35,7 @@ export default function CreateTaskDialog({ open, onClose, projects }: CreateTask
   const [mutationError, setMutationError] = useState("");
 
   const [createTask, { loading: creating }] = useMutation(CreateTaskDocument, {
-    refetchQueries: [{ query: GetTasksDocument }],
+    refetchQueries: ["GetTasks"],
   });
 
   const activeProjectId = projectId || (projects[0]?.id ?? "");
