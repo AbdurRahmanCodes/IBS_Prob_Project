@@ -8,17 +8,20 @@ import {
   CreateProjectDocument,
   GetProjectsDocument,
   GetTasksDocument,
+  type GetTasksQuery,
 } from "@/graphql/generated/graphql";
 import TaskCard from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
-import EditTaskDialog, { TaskToEdit } from "@/components/task-board/EditTaskDialog";
+import EditTaskDialog from "@/components/task-board/EditTaskDialog";
+
+type TaskItem = GetTasksQuery["tasks"][number];
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<TaskToEdit | null>(null);
+  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
   const [seedError, setSeedError] = useState("");
 
   const { data: tasksData, loading: loadingTasks, error: tasksError } = useQuery(GetTasksDocument);

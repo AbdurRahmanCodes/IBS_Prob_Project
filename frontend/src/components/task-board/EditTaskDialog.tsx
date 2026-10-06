@@ -2,36 +2,21 @@
 
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import {
-  Alert,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  MenuItem,
-  TextField,
-} from "@mui/material";
-import {
-  GetTasksDocument,
-  TaskPriority,
-  TaskStatus,
   UpdateTaskDocument,
+  type GetTasksQuery,
+  type TaskPriority,
+  type TaskStatus,
 } from "@/graphql/generated/graphql";
+import TaskFormFields from "./TaskFormFields";
 
-export interface TaskToEdit {
-  id: string;
-  title: string;
-  description?: string | null;
-  status: TaskStatus;
-  priority: TaskPriority;
-}
+type TaskItem = GetTasksQuery["tasks"][number];
 
 interface EditTaskDialogProps {
   open: boolean;
   onClose: () => void;
-  task: TaskToEdit | null;
+  task: TaskItem | null;
 }
 
 export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogProps) {
@@ -41,9 +26,7 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
   const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "MEDIUM");
   const [mutationError, setMutationError] = useState("");
 
-  const [updateTask, { loading: updating }] = useMutation(UpdateTaskDocument, {
-    refetchQueries: [{ query: GetTasksDocument }],
-  });
+  const [updateTask, { loading: updating }] = useMutation(UpdateTaskDocument);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,48 +61,17 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
               {mutationError}
             </Alert>
           )}
-          <TextField
-            autoFocus
-            fullWidth
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            margin="normal"
-            required
+          <TaskFormFields
+            title={title}
+            onTitleChange={setTitle}
+            description={description}
+            onDescriptionChange={setDescription}
+            status={status}
+            onStatusChange={setStatus}
+            priority={priority}
+            onPriorityChange={setPriority}
+            autoFocusTitle
           />
-          <TextField
-            fullWidth
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            margin="normal"
-            multiline
-            rows={3}
-          />
-          <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-            <TextField
-              select
-              fullWidth
-              label="Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as TaskStatus)}
-            >
-              <MenuItem value="TODO">To Do</MenuItem>
-              <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
-              <MenuItem value="DONE">Done</MenuItem>
-            </TextField>
-            <TextField
-              select
-              fullWidth
-              label="Priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as TaskPriority)}
-            >
-              <MenuItem value="LOW">Low</MenuItem>
-              <MenuItem value="MEDIUM">Medium</MenuItem>
-              <MenuItem value="HIGH">High</MenuItem>
-            </TextField>
-          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

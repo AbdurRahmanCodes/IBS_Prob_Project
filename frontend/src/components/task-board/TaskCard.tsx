@@ -1,21 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Card, CardContent, MenuItem, Select, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, MenuItem, Select, Typography } from "@mui/material";
 import {
-  GetTasksDocument,
-  TaskPriority,
-  TaskStatus,
   UpdateTaskDocument,
+  type GetTasksQuery,
+  type TaskStatus,
 } from "@/graphql/generated/graphql";
 
-export interface TaskItem {
-  id: string;
-  title: string;
-  description?: string | null;
-  status: TaskStatus;
-  priority: TaskPriority;
-}
+export type TaskItem = GetTasksQuery["tasks"][number];
 
 interface TaskCardProps {
   task: TaskItem;
@@ -35,12 +29,12 @@ const statusTextColors: Record<TaskStatus, string> = {
 };
 
 export default function TaskCard({ task, onEdit }: TaskCardProps) {
-  const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument, {
-    refetchQueries: [{ query: GetTasksDocument }],
-  });
+  const [statusError, setStatusError] = useState("");
+  const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument);
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     if (newStatus === task.status) return;
+    setStatusError("");
     try {
       await updateTask({
         variables: {
@@ -48,8 +42,8 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
           input: { status: newStatus },
         },
       });
-    } catch {
-      // In case of error, cache retains previous state
+    } catch (err) {
+      setStatusError(err instanceof Error ? err.message : "Failed to update status");
     }
   };
 
@@ -82,11 +76,22 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
           </Typography>
         )}
 
+        {statusError && (
+          <Alert
+            severity="error"
+            onClose={() => setStatusError("")}
+            sx={{ mb: 1, py: 0, fontSize: "0.75rem", "& .MuiAlert-icon": { fontSize: "1rem" } }}
+          >
+            {statusError}
+          </Alert>
+        )}
+
         <Box sx={{ display: "flex", gap: 1, alignItems: "center", mt: "auto", flexWrap: "wrap" }}>
           <Select
             size="small"
             value={task.status}
             disabled={updatingStatus}
+            inputProps={{ "aria-label": "Task status" }}
             onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
             sx={{
               fontSize: "0.75rem",
