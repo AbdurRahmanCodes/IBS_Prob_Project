@@ -77,6 +77,12 @@ export type UpdateTaskMutation = {
   };
 };
 
+export type DeleteTaskMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+export type DeleteTaskMutation = { deleteTask: string };
+
 export type DomainDataQueryVariables = Exact<{ [key: string]: never }>;
 
 export type DomainDataQuery = {
@@ -319,6 +325,42 @@ export const UpdateTaskDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateTaskMutation, UpdateTaskMutationVariables>;
+export const DeleteTaskDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DeleteTask" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "deleteTask" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteTaskMutation, DeleteTaskMutationVariables>;
 export const DomainDataDocument = {
   kind: "Document",
   definitions: [
