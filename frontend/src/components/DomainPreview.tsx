@@ -19,7 +19,7 @@ export default function DomainPreview() {
     <Stack spacing={1}>
       <Typography variant="body1">Users: {data?.users.length ?? 0}</Typography>
       <Typography variant="body1">Projects: {data?.projects.length ?? 0}</Typography>
-      <Typography variant="body1">Tasks: {data?.tasks.length ?? 0}</Typography>
+      <Typography variant="body1">Tasks: {data?.tasks.totalCount ?? 0}</Typography>
     </Stack>
   );
 }

@@ -13,18 +13,7 @@ query DomainData {
       name
     }
   }
-  tasks {
-    id
-    title
-    status
-    priority
-    project {
-      id
-      name
-    }
-    assignee {
-      id
-      name
-    }
+  tasks(page: 1, pageSize: 1) {
+    totalCount
   }
 }

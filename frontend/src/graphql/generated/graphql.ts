@@ -87,27 +87,29 @@ export type DomainDataQuery = {
     description: string | null;
     owner: { id: string; name: string };
   }>;
-  tasks: Array<{
-    id: string;
-    title: string;
-    status: TaskStatus;
-    priority: TaskPriority;
-    project: { id: string; name: string };
-    assignee: { id: string; name: string } | null;
-  }>;
+  tasks: { totalCount: number };
 };
 
-export type GetTasksQueryVariables = Exact<{ [key: string]: never }>;
+export type GetTasksQueryVariables = Exact<{
+  page?: number | null | undefined;
+  pageSize?: number | null | undefined;
+}>;
 
 export type GetTasksQuery = {
-  tasks: Array<{
-    id: string;
-    title: string;
-    description: string | null;
-    status: TaskStatus;
-    priority: TaskPriority;
-    createdAt: string;
-  }>;
+  tasks: {
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    items: Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      status: TaskStatus;
+      priority: TaskPriority;
+      createdAt: string;
+    }>;
+  };
 };
 
 export type GetProjectsQueryVariables = Exact<{ [key: string]: never }>;
@@ -365,36 +367,21 @@ export const DomainDataDocument = {
           {
             kind: "Field",
             name: { kind: "Name", value: "tasks" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "page" },
+                value: { kind: "IntValue", value: "1" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "pageSize" },
+                value: { kind: "IntValue", value: "1" },
+              },
+            ],
             selectionSet: {
               kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "title" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "priority" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "project" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "assignee" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                    ],
-                  },
-                },
-              ],
+              selections: [{ kind: "Field", name: { kind: "Name", value: "totalCount" } }],
             },
           },
         ],
@@ -409,21 +396,58 @@ export const GetTasksDocument = {
       kind: "OperationDefinition",
       operation: "query",
       name: { kind: "Name", value: "GetTasks" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "page" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "pageSize" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+      ],
       selectionSet: {
         kind: "SelectionSet",
         selections: [
           {
             kind: "Field",
             name: { kind: "Name", value: "tasks" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "page" },
+                value: { kind: "Variable", name: { kind: "Name", value: "page" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "pageSize" },
+                value: { kind: "Variable", name: { kind: "Name", value: "pageSize" } },
+              },
+            ],
             selectionSet: {
               kind: "SelectionSet",
               selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "title" } },
-                { kind: "Field", name: { kind: "Name", value: "description" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                { kind: "Field", name: { kind: "Name", value: "priority" } },
-                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "items" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "status" } },
+                      { kind: "Field", name: { kind: "Name", value: "priority" } },
+                      { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "totalCount" } },
+                { kind: "Field", name: { kind: "Name", value: "page" } },
+                { kind: "Field", name: { kind: "Name", value: "pageSize" } },
+                { kind: "Field", name: { kind: "Name", value: "totalPages" } },
               ],
             },
           },

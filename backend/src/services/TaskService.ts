@@ -19,14 +19,56 @@ export interface UpdateTaskInput {
   priority?: TaskPriority;
 }
 
+export interface ListTasksInput {
+  page?: number | null;
+  pageSize?: number | null;
+}
+
+export interface PaginatedTasksResponse {
+  items: Task[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 6;
+const MAX_PAGE_SIZE = 100;
+
 export class TaskService {
   constructor(
     private readonly repository = new TaskRepository(),
     private readonly projects = new ProjectRepository(),
   ) {}
 
-  async listTasks(): Promise<Task[]> {
-    return this.repository.findAll();
+  async listTasks(input?: ListTasksInput): Promise<PaginatedTasksResponse> {
+    const page = input?.page ?? DEFAULT_PAGE;
+    const pageSize = input?.pageSize ?? DEFAULT_PAGE_SIZE;
+
+    if (page < 1 || !Number.isInteger(page)) {
+      throw badInput("Page must be an integer greater than or equal to 1");
+    }
+
+    if (pageSize < 1 || pageSize > MAX_PAGE_SIZE || !Number.isInteger(pageSize)) {
+      throw badInput(`PageSize must be an integer between 1 and ${MAX_PAGE_SIZE}`);
+    }
+
+    const skip = (page - 1) * pageSize;
+    const { items, totalCount } = await this.repository.findPaginated({
+      skip,
+      take: pageSize,
+    });
+
+    const totalPages = Math.ceil(totalCount / pageSize) || 1;
+
+    return {
+      items,
+      totalCount,
+      page,
+      pageSize,
+      totalPages,
+    };
   }
 
   async createTask(input: CreateTaskInput, userId: string): Promise<Task> {

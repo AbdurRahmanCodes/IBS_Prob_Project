@@ -73,12 +73,20 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
+  type PaginatedTasks {
+    items: [Task!]!
+    totalCount: Int!
+    page: Int!
+    pageSize: Int!
+    totalPages: Int!
+  }
+
   type Query {
     health: String!
     me: User
     users: [User!]!
     projects: [Project!]!
-    tasks: [Task!]!
+    tasks(page: Int, pageSize: Int): PaginatedTasks!
   }
 
   type Mutation {

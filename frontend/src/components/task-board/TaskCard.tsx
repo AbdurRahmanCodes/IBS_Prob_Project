@@ -9,7 +9,7 @@ import {
   type TaskStatus,
 } from "@/graphql/generated/graphql";
 
-export type TaskItem = GetTasksQuery["tasks"][number];
+export type TaskItem = GetTasksQuery["tasks"]["items"][number];
 
 interface TaskCardProps {
   task: TaskItem;

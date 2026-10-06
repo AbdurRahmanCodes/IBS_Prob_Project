@@ -37,9 +37,13 @@ export const resolvers = {
       requireUserId(context);
       return projectService.listProjects();
     },
-    tasks: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+    tasks: (
+      _parent: unknown,
+      { page, pageSize }: { page?: number | null; pageSize?: number | null },
+      context: GraphQLContext,
+    ) => {
       requireUserId(context);
-      return taskService.listTasks();
+      return taskService.listTasks({ page, pageSize });
     },
   },
   Mutation: {

@@ -1,11 +1,17 @@
-query GetTasks {
-  tasks {
-    id
-    title
-    description
-    status
-    priority
-    createdAt
+query GetTasks($page: Int, $pageSize: Int) {
+  tasks(page: $page, pageSize: $pageSize) {
+    items {
+      id
+      title
+      description
+      status
+      priority
+      createdAt
+    }
+    totalCount
+    page
+    pageSize
+    totalPages
   }
 }
 

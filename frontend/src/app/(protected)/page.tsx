@@ -2,29 +2,45 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
-import { Alert, Box, Button, CircularProgress, Container, Grid, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Grid,
+  Pagination,
+  Typography,
+} from "@mui/material";
 import { useAuthStore } from "@/store/auth-store";
 import {
   CreateProjectDocument,
   GetProjectsDocument,
   GetTasksDocument,
-  type GetTasksQuery,
 } from "@/graphql/generated/graphql";
-import TaskCard from "@/components/task-board/TaskCard";
+import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
 import EditTaskDialog from "@/components/task-board/EditTaskDialog";
 
-type TaskItem = GetTasksQuery["tasks"][number];
+const PAGE_SIZE = 6;
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
+  const [page, setPage] = useState(1);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
   const [seedError, setSeedError] = useState("");
 
-  const { data: tasksData, loading: loadingTasks, error: tasksError } = useQuery(GetTasksDocument);
+  const {
+    data: tasksData,
+    loading: loadingTasks,
+    error: tasksError,
+    previousData,
+  } = useQuery(GetTasksDocument, {
+    variables: { page, pageSize: PAGE_SIZE },
+  });
 
   const {
     data: projectsData,
@@ -37,6 +53,10 @@ export default function DashboardPage() {
   });
 
   const projects = projectsData?.projects ?? [];
+  const currentTasksData = tasksData ?? previousData;
+  const tasks = currentTasksData?.tasks.items ?? [];
+  const totalPages = currentTasksData?.tasks.totalPages ?? 1;
+  const totalCount = currentTasksData?.tasks.totalCount ?? 0;
 
   // Only show seed button when the query has settled with an empty result
   const showSeedButton = !loadingProjects && !projectsError && projects.length === 0;
@@ -88,11 +108,16 @@ export default function DashboardPage() {
         </Alert>
       )}
 
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Tasks
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+        <Typography variant="h5">Tasks</Typography>
+        {!tasksError && totalCount > 0 && (
+          <Typography variant="body2" color="text.secondary">
+            Showing {tasks.length} of {totalCount} {totalCount === 1 ? "task" : "tasks"}
+          </Typography>
+        )}
+      </Box>
 
-      {loadingTasks && (
+      {loadingTasks && !currentTasksData && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
@@ -104,26 +129,44 @@ export default function DashboardPage() {
         </Alert>
       )}
 
-      {!loadingTasks && !tasksError && tasksData?.tasks.length === 0 && (
+      {!loadingTasks && !tasksError && tasks.length === 0 && (
         <Typography color="text.secondary" sx={{ mt: 2, fontStyle: "italic" }}>
           No tasks yet. Create one above.
         </Typography>
       )}
 
-      <Grid container spacing={3}>
-        {!loadingTasks &&
-          !tasksError &&
-          tasksData?.tasks.map((task) => (
+      <Grid
+        container
+        spacing={3}
+        sx={{ opacity: loadingTasks ? 0.6 : 1, transition: "opacity 0.2s ease" }}
+      >
+        {!tasksError &&
+          tasks.map((task) => (
             <Grid size={{ xs: 12, sm: 6 }} key={task.id}>
               <TaskCard task={task} onEdit={(t) => setEditingTask(t)} />
             </Grid>
           ))}
       </Grid>
 
+      {!tasksError && totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(_event, value) => setPage(value)}
+            color="primary"
+            showFirstButton
+            showLastButton
+            disabled={loadingTasks}
+          />
+        </Box>
+      )}
+
       <CreateTaskDialog
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         projects={projects}
+        onSuccess={() => setPage(1)}
       />
 
       <EditTaskDialog
