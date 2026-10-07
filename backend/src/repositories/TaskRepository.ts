@@ -1,8 +1,11 @@
-import { In, LessThanOrEqual } from "typeorm";
+import { Between, In } from "typeorm";
 import { Task } from "../entities/Task";
 import { TaskStatus, TaskPriority } from "../entities/Task";
 import { AppDataSource } from "../config/DataSource";
 import { publicUserSelect } from "./UserRepository";
+
+export const DEFAULT_DUE_SOON_DAYS = 7;
+export const DEFAULT_DUE_SOON_LIMIT = 5;
 
 export interface CreateTaskData {
   title: string;
@@ -10,6 +13,7 @@ export interface CreateTaskData {
   status: TaskStatus;
   priority: TaskPriority;
   project: { id: string };
+  dueDate?: Date | null;
 }
 
 export interface UpdateTaskData {
@@ -17,6 +21,7 @@ export interface UpdateTaskData {
   description?: string | null;
   status?: TaskStatus;
   priority?: TaskPriority;
+  dueDate?: Date | null;
 }
 
 export interface FindPaginatedTasksOptions {
@@ -78,6 +83,7 @@ export class TaskRepository {
       status: data.status,
       priority: data.priority,
       project: data.project,
+      dueDate: data.dueDate ?? null,
     });
     const saved = await repo.save(task);
     return (await this.findById(saved.id))!;
@@ -107,40 +113,36 @@ export class TaskRepository {
     await AppDataSource.getRepository(Task).delete(id);
   }
 
+  private getDueSoonCriteria() {
+    const now = new Date();
+    const future = new Date();
+    future.setDate(now.getDate() + DEFAULT_DUE_SOON_DAYS);
+
+    return {
+      status: In([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
+      dueDate: Between(now, future),
+    };
+  }
+
   async getStats(): Promise<TaskStatsResult> {
     const repo = AppDataSource.getRepository(Task);
 
-    const [total, todo, inProgress, done] = await Promise.all([
+    const [total, todo, inProgress, done, dueSoon] = await Promise.all([
       repo.count(),
       repo.count({ where: { status: TaskStatus.TODO } }),
       repo.count({ where: { status: TaskStatus.IN_PROGRESS } }),
       repo.count({ where: { status: TaskStatus.DONE } }),
+      repo.count({ where: this.getDueSoonCriteria() }),
     ]);
-
-    const sevenDaysFromNow = new Date();
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-
-    const dueSoon = await repo.count({
-      where: {
-        status: In([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
-        dueDate: LessThanOrEqual(sevenDaysFromNow),
-      },
-    });
 
     return { total, todo, inProgress, done, dueSoon };
   }
 
-  async findDueSoon(limit = 5): Promise<Task[]> {
-    const sevenDaysFromNow = new Date();
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-
+  async findDueSoon(limit = DEFAULT_DUE_SOON_LIMIT): Promise<Task[]> {
     return AppDataSource.getRepository(Task).find({
       select: taskSelect,
       relations: { project: { owner: true }, assignee: true },
-      where: {
-        status: In([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
-        dueDate: LessThanOrEqual(sevenDaysFromNow),
-      },
+      where: this.getDueSoonCriteria(),
       order: { dueDate: "ASC" },
       take: limit,
     });

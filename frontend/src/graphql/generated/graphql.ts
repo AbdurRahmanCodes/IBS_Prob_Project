@@ -12,6 +12,7 @@ export type CreateProjectInput = {
 
 export type CreateTaskInput = {
   description?: string | null | undefined;
+  dueDate?: string | null | undefined;
   priority: TaskPriority;
   projectId: string | number;
   status: TaskStatus;
@@ -29,6 +30,7 @@ export type TaskStatus = "DONE" | "IN_PROGRESS" | "TODO";
 
 export type UpdateTaskInput = {
   description?: string | null | undefined;
+  dueDate?: string | null | undefined;
   priority?: TaskPriority | null | undefined;
   status?: TaskStatus | null | undefined;
   title?: string | null | undefined;
@@ -51,6 +53,7 @@ export type CreateTaskMutation = {
     description: string | null;
     status: TaskStatus;
     priority: TaskPriority;
+    dueDate: string | null;
     createdAt: string;
   };
 };
@@ -73,6 +76,7 @@ export type UpdateTaskMutation = {
     description: string | null;
     status: TaskStatus;
     priority: TaskPriority;
+    dueDate: string | null;
     createdAt: string;
   };
 };
@@ -130,6 +134,7 @@ export type GetTasksQuery = {
       description: string | null;
       status: TaskStatus;
       priority: TaskPriority;
+      dueDate: string | null;
       createdAt: string;
       project: { id: string; owner: { id: string } };
     }>;
@@ -231,6 +236,7 @@ export const CreateTaskDocument = {
                 { kind: "Field", name: { kind: "Name", value: "description" } },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 { kind: "Field", name: { kind: "Name", value: "priority" } },
+                { kind: "Field", name: { kind: "Name", value: "dueDate" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
               ],
             },
@@ -334,6 +340,7 @@ export const UpdateTaskDocument = {
                 { kind: "Field", name: { kind: "Name", value: "description" } },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 { kind: "Field", name: { kind: "Name", value: "priority" } },
+                { kind: "Field", name: { kind: "Name", value: "dueDate" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
               ],
             },
@@ -564,6 +571,7 @@ export const GetTasksDocument = {
                       { kind: "Field", name: { kind: "Name", value: "description" } },
                       { kind: "Field", name: { kind: "Name", value: "status" } },
                       { kind: "Field", name: { kind: "Name", value: "priority" } },
+                      { kind: "Field", name: { kind: "Name", value: "dueDate" } },
                       { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                       {
                         kind: "Field",

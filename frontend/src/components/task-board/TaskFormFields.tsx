@@ -12,6 +12,8 @@ interface TaskFormFieldsProps {
   onStatusChange: (val: TaskStatus) => void;
   priority: TaskPriority;
   onPriorityChange: (val: TaskPriority) => void;
+  dueDate: string;
+  onDueDateChange: (val: string) => void;
   autoFocusTitle?: boolean;
 }
 
@@ -24,6 +26,8 @@ export default function TaskFormFields({
   onStatusChange,
   priority,
   onPriorityChange,
+  dueDate,
+  onDueDateChange,
   autoFocusTitle = false,
 }: TaskFormFieldsProps) {
   return (
@@ -46,7 +50,7 @@ export default function TaskFormFields({
         multiline
         rows={3}
       />
-      <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+      <Box sx={{ display: "flex", gap: 2, mt: 1, flexDirection: { xs: "column", sm: "row" } }}>
         <TextField
           select
           fullWidth
@@ -69,6 +73,14 @@ export default function TaskFormFields({
           <MenuItem value="MEDIUM">Medium</MenuItem>
           <MenuItem value="HIGH">High</MenuItem>
         </TextField>
+        <TextField
+          type="date"
+          fullWidth
+          label="Due Date"
+          value={dueDate}
+          onChange={(e) => onDueDateChange(e.target.value)}
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
       </Box>
     </>
   );

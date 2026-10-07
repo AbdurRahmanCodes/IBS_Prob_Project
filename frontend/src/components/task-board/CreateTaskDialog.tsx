@@ -38,6 +38,7 @@ export default function CreateTaskDialog({
   const [status, setStatus] = useState<TaskStatus>("TODO");
   const [priority, setPriority] = useState<TaskPriority>("MEDIUM");
   const [projectId, setProjectId] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [mutationError, setMutationError] = useState("");
 
   const [createTask, { loading: creating }] = useMutation(CreateTaskDocument, {
@@ -56,6 +57,7 @@ export default function CreateTaskDialog({
     setStatus("TODO");
     setPriority("MEDIUM");
     setProjectId("");
+    setDueDate("");
     setMutationError("");
     onClose();
   }
@@ -73,6 +75,7 @@ export default function CreateTaskDialog({
             status,
             priority,
             projectId: activeProjectId,
+            dueDate: dueDate || null,
           },
         },
       });
@@ -122,6 +125,8 @@ export default function CreateTaskDialog({
             onStatusChange={setStatus}
             priority={priority}
             onPriorityChange={setPriority}
+            dueDate={dueDate}
+            onDueDateChange={setDueDate}
           />
         </DialogContent>
         <DialogActions>

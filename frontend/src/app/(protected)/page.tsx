@@ -6,6 +6,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Container,
   Grid,
@@ -119,12 +120,78 @@ export default function DashboardPage() {
       </Box>
 
       {dashboardError && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
           Failed to load dashboard metrics: {dashboardError.message}
         </Alert>
       )}
 
-      <StatCards stats={dashboardData?.dashboard.stats} loading={loadingDashboard} />
+      {!dashboardError && (
+        <StatCards stats={dashboardData?.dashboard.stats} loading={loadingDashboard} />
+      )}
+
+      {!dashboardError &&
+        dashboardData?.dashboard.dueSoonTasks &&
+        dashboardData.dashboard.dueSoonTasks.length > 0 && (
+          <Box
+            sx={{
+              p: 2.5,
+              mb: 4,
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              border: 1,
+              borderColor: "warning.light",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 1.5,
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "warning.dark" }}>
+                Upcoming Deadlines (Due within 7 days)
+              </Typography>
+              <Chip
+                label={`${dashboardData.dashboard.dueSoonTasks.length} urgent`}
+                size="small"
+                color="warning"
+                variant="outlined"
+              />
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {dashboardData.dashboard.dueSoonTasks.map((t) => (
+                <Box
+                  key={t.id}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    p: 1.5,
+                    borderRadius: 1,
+                    bgcolor: "action.hover",
+                  }}
+                >
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {t.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Project: {t.project.name} • Status: {t.status}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={t.dueDate ? `Due ${t.dueDate.split("T")[0]}` : "No date"}
+                    size="small"
+                    color="error"
+                    variant="filled"
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
 
       {seedError && (
         <Alert severity="error" sx={{ mb: 3 }}>

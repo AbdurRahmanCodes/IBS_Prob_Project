@@ -1,6 +1,10 @@
 import { Task } from "../entities/Task";
 import { TaskStatus, TaskPriority } from "../entities/Task";
-import { TaskRepository } from "../repositories/TaskRepository";
+import {
+  TaskRepository,
+  type TaskStatsResult,
+  type UpdateTaskData,
+} from "../repositories/TaskRepository";
 import { ProjectRepository } from "../repositories/ProjectRepository";
 import { badInput, forbidden } from "../auth/errors";
 
@@ -10,6 +14,7 @@ export interface CreateTaskInput {
   status: TaskStatus;
   priority: TaskPriority;
   projectId: string;
+  dueDate?: string | null;
 }
 
 export interface UpdateTaskInput {
@@ -17,6 +22,7 @@ export interface UpdateTaskInput {
   description?: string | null;
   status?: TaskStatus;
   priority?: TaskPriority;
+  dueDate?: string | null;
 }
 
 export interface ListTasksInput {
@@ -32,16 +38,8 @@ export interface PaginatedTasksResponse {
   totalPages: number;
 }
 
-export interface TaskStatsResponse {
-  total: number;
-  todo: number;
-  inProgress: number;
-  done: number;
-  dueSoon: number;
-}
-
 export interface DashboardResponse {
-  stats: TaskStatsResponse;
+  stats: TaskStatsResult;
   dueSoonTasks: Task[];
 }
 
@@ -103,7 +101,18 @@ export class TaskService {
       status: input.status,
       priority: input.priority,
       project: { id: project.id },
+      dueDate: this.parseDueDate(input.dueDate),
     });
+  }
+
+  private parseDueDate(dueDateStr?: string | null): Date | null | undefined {
+    if (dueDateStr === undefined) return undefined;
+    if (dueDateStr === null || dueDateStr.trim() === "") return null;
+    const parsed = new Date(dueDateStr);
+    if (isNaN(parsed.getTime())) {
+      throw badInput("Invalid dueDate format");
+    }
+    return parsed;
   }
 
   private async findTaskAndCheckOwnership(id: string, userId: string): Promise<Task> {
@@ -127,12 +136,13 @@ export class TaskService {
       input.title === undefined &&
       input.description === undefined &&
       input.status === undefined &&
-      input.priority === undefined
+      input.priority === undefined &&
+      input.dueDate === undefined
     ) {
       return task;
     }
 
-    const updateData: UpdateTaskInput = {};
+    const updateData: UpdateTaskData = {};
 
     if (input.title !== undefined) {
       if (input.title === null) {
@@ -161,6 +171,10 @@ export class TaskService {
         throw badInput("Task priority must not be null");
       }
       updateData.priority = input.priority;
+    }
+
+    if (input.dueDate !== undefined) {
+      updateData.dueDate = this.parseDueDate(input.dueDate);
     }
 
     return this.repository.update(id, updateData);

@@ -22,6 +22,7 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
   const [description, setDescription] = useState(task?.description ?? "");
   const [status, setStatus] = useState<TaskStatus>(task?.status ?? "TODO");
   const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "MEDIUM");
+  const [dueDate, setDueDate] = useState(task?.dueDate ? task.dueDate.split("T")[0] : "");
   const [mutationError, setMutationError] = useState("");
 
   const [updateTask, { loading: updating }] = useMutation(UpdateTaskDocument, {
@@ -45,6 +46,7 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
             description,
             status,
             priority,
+            dueDate: dueDate || null,
           },
         },
       });
@@ -73,6 +75,8 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
             onStatusChange={setStatus}
             priority={priority}
             onPriorityChange={setPriority}
+            dueDate={dueDate}
+            onDueDateChange={setDueDate}
             autoFocusTitle
           />
         </DialogContent>

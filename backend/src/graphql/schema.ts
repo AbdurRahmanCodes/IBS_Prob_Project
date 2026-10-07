@@ -17,6 +17,7 @@ export const typeDefs = `#graphql
     status: TaskStatus!
     priority: TaskPriority!
     projectId: ID!
+    dueDate: String
   }
 
   input UpdateTaskInput {
@@ -24,6 +25,7 @@ export const typeDefs = `#graphql
     description: String
     status: TaskStatus
     priority: TaskPriority
+    dueDate: String
   }
 
   input CreateProjectInput {

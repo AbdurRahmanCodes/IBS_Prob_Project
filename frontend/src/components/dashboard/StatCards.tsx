@@ -1,14 +1,9 @@
 "use client";
 
 import { Box, Card, CardContent, Grid, Skeleton, Typography } from "@mui/material";
+import type { GetDashboardQuery } from "@/graphql/generated/graphql";
 
-export interface TaskStatsData {
-  total: number;
-  todo: number;
-  inProgress: number;
-  done: number;
-  dueSoon: number;
-}
+export type TaskStatsData = GetDashboardQuery["dashboard"]["stats"];
 
 interface StatCardsProps {
   stats?: TaskStatsData | null;
@@ -19,7 +14,6 @@ interface StatItem {
   key: keyof TaskStatsData;
   label: string;
   color: string;
-  bgLight: string;
   borderColor: string;
   description: string;
 }
@@ -29,7 +23,6 @@ const STAT_CONFIG: StatItem[] = [
     key: "total",
     label: "Total Tasks",
     color: "primary.main",
-    bgLight: "primary.50",
     borderColor: "primary.light",
     description: "All active & completed",
   },
@@ -37,7 +30,6 @@ const STAT_CONFIG: StatItem[] = [
     key: "todo",
     label: "To Do",
     color: "info.main",
-    bgLight: "info.50",
     borderColor: "info.light",
     description: "Not yet started",
   },
@@ -45,7 +37,6 @@ const STAT_CONFIG: StatItem[] = [
     key: "inProgress",
     label: "In Progress",
     color: "warning.main",
-    bgLight: "warning.50",
     borderColor: "warning.light",
     description: "Currently being worked on",
   },
@@ -53,7 +44,6 @@ const STAT_CONFIG: StatItem[] = [
     key: "done",
     label: "Done",
     color: "success.main",
-    bgLight: "success.50",
     borderColor: "success.light",
     description: "Completed tasks",
   },
@@ -61,7 +51,6 @@ const STAT_CONFIG: StatItem[] = [
     key: "dueSoon",
     label: "Due Soon",
     color: "error.main",
-    bgLight: "error.50",
     borderColor: "error.light",
     description: "Due within 7 days",
   },

@@ -38,6 +38,7 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument, {
     update(cache) {
       cache.evict({ fieldName: "dashboard" });
+      cache.gc();
     },
   });
 
@@ -143,6 +144,12 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
           >
             {task.priority}
           </Box>
+
+          {task.dueDate && (
+            <Typography variant="caption" color="text.secondary" sx={{ ml: "auto" }}>
+              Due: {task.dueDate.split("T")[0]}
+            </Typography>
+          )}
         </Box>
       </CardContent>
     </Card>
