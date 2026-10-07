@@ -28,6 +28,8 @@ export interface UpdateTaskInput {
 export interface ListTasksInput {
   page?: number | null;
   pageSize?: number | null;
+  status?: TaskStatus | null;
+  projectId?: string | null;
 }
 
 export interface PaginatedTasksResponse {
@@ -56,6 +58,8 @@ export class TaskService {
   async listTasks(input?: ListTasksInput): Promise<PaginatedTasksResponse> {
     const page = input?.page ?? DEFAULT_PAGE;
     const pageSize = input?.pageSize ?? DEFAULT_PAGE_SIZE;
+    const status = input?.status || undefined;
+    const projectId = input?.projectId?.trim() || undefined;
 
     if (page < 1 || !Number.isInteger(page)) {
       throw badInput("Page must be an integer greater than or equal to 1");
@@ -69,6 +73,8 @@ export class TaskService {
     const { items, totalCount } = await this.repository.findPaginated({
       skip,
       take: pageSize,
+      status,
+      projectId,
     });
 
     const totalPages = Math.ceil(totalCount / pageSize) || 1;

@@ -37,6 +37,7 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const [statusError, setStatusError] = useState("");
   const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument, {
     update(cache) {
+      cache.evict({ fieldName: "tasks" });
       cache.evict({ fieldName: "dashboard" });
       cache.gc();
     },

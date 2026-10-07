@@ -120,6 +120,8 @@ export type DomainDataQuery = {
 export type GetTasksQueryVariables = Exact<{
   page?: number | null | undefined;
   pageSize?: number | null | undefined;
+  status?: TaskStatus | null | undefined;
+  projectId?: string | number | null | undefined;
 }>;
 
 export type GetTasksQuery = {
@@ -538,6 +540,16 @@ export const GetTasksDocument = {
           variable: { kind: "Variable", name: { kind: "Name", value: "pageSize" } },
           type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
         },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "status" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "TaskStatus" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "projectId" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+        },
       ],
       selectionSet: {
         kind: "SelectionSet",
@@ -555,6 +567,16 @@ export const GetTasksDocument = {
                 kind: "Argument",
                 name: { kind: "Name", value: "pageSize" },
                 value: { kind: "Variable", name: { kind: "Name", value: "pageSize" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "status" },
+                value: { kind: "Variable", name: { kind: "Name", value: "status" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "projectId" },
+                value: { kind: "Variable", name: { kind: "Name", value: "projectId" } },
               },
             ],
             selectionSet: {

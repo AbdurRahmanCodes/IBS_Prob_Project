@@ -27,6 +27,7 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
 
   const [updateTask, { loading: updating }] = useMutation(UpdateTaskDocument, {
     update(cache) {
+      cache.evict({ fieldName: "tasks" });
       cache.evict({ fieldName: "dashboard" });
       cache.gc();
     },

@@ -19,11 +19,13 @@ import {
   GetDashboardDocument,
   GetProjectsDocument,
   GetTasksDocument,
+  type TaskStatus,
 } from "@/graphql/generated/graphql";
 import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
 import EditTaskDialog from "@/components/task-board/EditTaskDialog";
 import DeleteTaskDialog from "@/components/task-board/DeleteTaskDialog";
+import TaskFilters from "@/components/task-board/TaskFilters";
 import StatCards from "@/components/dashboard/StatCards";
 
 const PAGE_SIZE = 6;
@@ -33,6 +35,8 @@ export default function DashboardPage() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<TaskStatus | "">("");
+  const [projectFilter, setProjectFilter] = useState<string>("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
   const [deletingTask, setDeletingTask] = useState<TaskItem | null>(null);
@@ -44,7 +48,12 @@ export default function DashboardPage() {
     error: tasksError,
     previousData,
   } = useQuery(GetTasksDocument, {
-    variables: { page, pageSize: PAGE_SIZE },
+    variables: {
+      page,
+      pageSize: PAGE_SIZE,
+      status: statusFilter || undefined,
+      projectId: projectFilter || undefined,
+    },
   });
 
   const {
@@ -87,6 +96,24 @@ export default function DashboardPage() {
     if (tasks.length === 1 && page > 1) {
       setPage((prev) => Math.max(1, prev - 1));
     }
+  };
+
+  const hasActiveFilters = Boolean(statusFilter || projectFilter);
+
+  const handleStatusFilterChange = (newStatus: TaskStatus | "") => {
+    setStatusFilter(newStatus);
+    setPage(1);
+  };
+
+  const handleProjectFilterChange = (newProjectId: string) => {
+    setProjectFilter(newProjectId);
+    setPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setStatusFilter("");
+    setProjectFilter("");
+    setPage(1);
   };
 
   return (
@@ -208,6 +235,16 @@ export default function DashboardPage() {
         )}
       </Box>
 
+      <TaskFilters
+        status={statusFilter}
+        onStatusChange={handleStatusFilterChange}
+        projectId={projectFilter}
+        onProjectChange={handleProjectFilterChange}
+        projects={projects}
+        hasActiveFilters={hasActiveFilters}
+        onReset={handleResetFilters}
+      />
+
       {loadingTasks && !currentTasksData && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
@@ -222,7 +259,9 @@ export default function DashboardPage() {
 
       {!loadingTasks && !tasksError && tasks.length === 0 && (
         <Typography color="text.secondary" sx={{ mt: 2, fontStyle: "italic" }}>
-          No tasks yet. Create one above.
+          {hasActiveFilters
+            ? "No tasks match your selected filters. Try adjusting or clearing filters."
+            : "No tasks yet. Create one above."}
         </Typography>
       )}
 

@@ -1,4 +1,4 @@
-import { Between, In } from "typeorm";
+import { Between, In, type FindOptionsWhere } from "typeorm";
 import { Task } from "../entities/Task";
 import { TaskStatus, TaskPriority } from "../entities/Task";
 import { AppDataSource } from "../config/DataSource";
@@ -27,6 +27,8 @@ export interface UpdateTaskData {
 export interface FindPaginatedTasksOptions {
   skip: number;
   take: number;
+  status?: TaskStatus;
+  projectId?: string;
 }
 
 export interface PaginatedTasksResult {
@@ -64,7 +66,19 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export class TaskRepository {
   async findPaginated(options: FindPaginatedTasksOptions): Promise<PaginatedTasksResult> {
+    const where: FindOptionsWhere<Task> = {};
+    if (options.status) {
+      where.status = options.status;
+    }
+    if (options.projectId) {
+      if (!UUID_REGEX.test(options.projectId)) {
+        return { items: [], totalCount: 0 };
+      }
+      where.project = { id: options.projectId };
+    }
+
     const [items, totalCount] = await AppDataSource.getRepository(Task).findAndCount({
+      where,
       select: taskSelect,
       relations: { project: { owner: true }, assignee: true },
       skip: options.skip,
