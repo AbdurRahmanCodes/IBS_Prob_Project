@@ -35,7 +35,11 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const isOwner = Boolean(currentUserId && task.project.owner.id === currentUserId);
 
   const [statusError, setStatusError] = useState("");
-  const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument);
+  const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument, {
+    update(cache) {
+      cache.evict({ fieldName: "dashboard" });
+    },
+  });
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     if (newStatus === task.status) return;

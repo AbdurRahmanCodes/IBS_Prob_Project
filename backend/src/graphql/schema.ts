@@ -81,12 +81,26 @@ export const typeDefs = `#graphql
     totalPages: Int!
   }
 
+  type TaskStats {
+    total: Int!
+    todo: Int!
+    inProgress: Int!
+    done: Int!
+    dueSoon: Int!
+  }
+
+  type DashboardData {
+    stats: TaskStats!
+    dueSoonTasks: [Task!]!
+  }
+
   type Query {
     health: String!
     me: User
     users: [User!]!
     projects: [Project!]!
     tasks(page: Int, pageSize: Int): PaginatedTasks!
+    dashboard: DashboardData!
   }
 
   type Mutation {

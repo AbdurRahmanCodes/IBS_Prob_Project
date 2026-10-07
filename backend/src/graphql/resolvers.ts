@@ -45,6 +45,10 @@ export const resolvers = {
       requireUserId(context);
       return taskService.listTasks({ page, pageSize });
     },
+    dashboard: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      requireUserId(context);
+      return taskService.getDashboardData();
+    },
   },
   Mutation: {
     register: (

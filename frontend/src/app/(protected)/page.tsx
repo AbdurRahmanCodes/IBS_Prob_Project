@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from "@/store/auth-store";
 import {
   CreateProjectDocument,
+  GetDashboardDocument,
   GetProjectsDocument,
   GetTasksDocument,
 } from "@/graphql/generated/graphql";
@@ -22,6 +23,7 @@ import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
 import EditTaskDialog from "@/components/task-board/EditTaskDialog";
 import DeleteTaskDialog from "@/components/task-board/DeleteTaskDialog";
+import StatCards from "@/components/dashboard/StatCards";
 
 const PAGE_SIZE = 6;
 
@@ -49,6 +51,12 @@ export default function DashboardPage() {
     loading: loadingProjects,
     error: projectsError,
   } = useQuery(GetProjectsDocument);
+
+  const {
+    data: dashboardData,
+    loading: loadingDashboard,
+    error: dashboardError,
+  } = useQuery(GetDashboardDocument);
 
   const [createProject, { loading: creatingProject }] = useMutation(CreateProjectDocument, {
     refetchQueries: [{ query: GetProjectsDocument }],
@@ -109,6 +117,14 @@ export default function DashboardPage() {
       <Box sx={{ p: 3, mb: 4, bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}>
         <Typography variant="h6">Welcome back, {user?.name ?? "User"}!</Typography>
       </Box>
+
+      {dashboardError && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Failed to load dashboard metrics: {dashboardError.message}
+        </Alert>
+      )}
+
+      <StatCards stats={dashboardData?.dashboard.stats} loading={loadingDashboard} />
 
       {seedError && (
         <Alert severity="error" sx={{ mb: 3 }}>

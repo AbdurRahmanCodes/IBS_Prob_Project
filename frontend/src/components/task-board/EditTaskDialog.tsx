@@ -24,7 +24,12 @@ export default function EditTaskDialog({ open, onClose, task }: EditTaskDialogPr
   const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "MEDIUM");
   const [mutationError, setMutationError] = useState("");
 
-  const [updateTask, { loading: updating }] = useMutation(UpdateTaskDocument);
+  const [updateTask, { loading: updating }] = useMutation(UpdateTaskDocument, {
+    update(cache) {
+      cache.evict({ fieldName: "dashboard" });
+      cache.gc();
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

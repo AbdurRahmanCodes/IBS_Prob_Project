@@ -32,6 +32,19 @@ export interface PaginatedTasksResponse {
   totalPages: number;
 }
 
+export interface TaskStatsResponse {
+  total: number;
+  todo: number;
+  inProgress: number;
+  done: number;
+  dueSoon: number;
+}
+
+export interface DashboardResponse {
+  stats: TaskStatsResponse;
+  dueSoonTasks: Task[];
+}
+
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 6;
 const MAX_PAGE_SIZE = 100;
@@ -157,5 +170,17 @@ export class TaskService {
     await this.findTaskAndCheckOwnership(id, userId);
     await this.repository.delete(id);
     return id;
+  }
+
+  async getDashboardData(): Promise<DashboardResponse> {
+    const [stats, dueSoonTasks] = await Promise.all([
+      this.repository.getStats(),
+      this.repository.findDueSoon(5),
+    ]);
+
+    return {
+      stats,
+      dueSoonTasks,
+    };
   }
 }

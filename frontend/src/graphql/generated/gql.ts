@@ -16,6 +16,7 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
 type Documents = {
   "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    user {\n      id\n      name\n    }\n  }\n}": typeof types.LoginDocument;
   "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation DeleteTask($id: ID!) {\n  deleteTask(id: $id)\n}": typeof types.CreateTaskDocument;
+  "query GetDashboard {\n  dashboard {\n    stats {\n      total\n      todo\n      inProgress\n      done\n      dueSoon\n    }\n    dueSoonTasks {\n      id\n      title\n      status\n      priority\n      dueDate\n      createdAt\n      project {\n        id\n        name\n      }\n    }\n  }\n}": typeof types.GetDashboardDocument;
   "query DomainData {\n  users {\n    id\n    name\n    createdAt\n  }\n  projects {\n    id\n    name\n    description\n    owner {\n      id\n      name\n    }\n  }\n  tasks(page: 1, pageSize: 1) {\n    totalCount\n  }\n}": typeof types.DomainDataDocument;
   "query GetTasks($page: Int, $pageSize: Int) {\n  tasks(page: $page, pageSize: $pageSize) {\n    items {\n      id\n      title\n      description\n      status\n      priority\n      createdAt\n      project {\n        id\n        owner {\n          id\n        }\n      }\n    }\n    totalCount\n    page\n    pageSize\n    totalPages\n  }\n}\n\nquery GetProjects {\n  projects {\n    id\n    name\n  }\n}": typeof types.GetTasksDocument;
 };
@@ -24,6 +25,8 @@ const documents: Documents = {
     types.LoginDocument,
   "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation DeleteTask($id: ID!) {\n  deleteTask(id: $id)\n}":
     types.CreateTaskDocument,
+  "query GetDashboard {\n  dashboard {\n    stats {\n      total\n      todo\n      inProgress\n      done\n      dueSoon\n    }\n    dueSoonTasks {\n      id\n      title\n      status\n      priority\n      dueDate\n      createdAt\n      project {\n        id\n        name\n      }\n    }\n  }\n}":
+    types.GetDashboardDocument,
   "query DomainData {\n  users {\n    id\n    name\n    createdAt\n  }\n  projects {\n    id\n    name\n    description\n    owner {\n      id\n      name\n    }\n  }\n  tasks(page: 1, pageSize: 1) {\n    totalCount\n  }\n}":
     types.DomainDataDocument,
   "query GetTasks($page: Int, $pageSize: Int) {\n  tasks(page: $page, pageSize: $pageSize) {\n    items {\n      id\n      title\n      description\n      status\n      priority\n      createdAt\n      project {\n        id\n        owner {\n          id\n        }\n      }\n    }\n    totalCount\n    page\n    pageSize\n    totalPages\n  }\n}\n\nquery GetProjects {\n  projects {\n    id\n    name\n  }\n}":
@@ -56,6 +59,12 @@ export function graphql(
 export function graphql(
   source: "mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation DeleteTask($id: ID!) {\n  deleteTask(id: $id)\n}",
 ): (typeof documents)["mutation CreateTask($input: CreateTaskInput!) {\n  createTask(input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    id\n    name\n  }\n}\n\nmutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {\n  updateTask(id: $id, input: $input) {\n    id\n    title\n    description\n    status\n    priority\n    createdAt\n  }\n}\n\nmutation DeleteTask($id: ID!) {\n  deleteTask(id: $id)\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "query GetDashboard {\n  dashboard {\n    stats {\n      total\n      todo\n      inProgress\n      done\n      dueSoon\n    }\n    dueSoonTasks {\n      id\n      title\n      status\n      priority\n      dueDate\n      createdAt\n      project {\n        id\n        name\n      }\n    }\n  }\n}",
+): (typeof documents)["query GetDashboard {\n  dashboard {\n    stats {\n      total\n      todo\n      inProgress\n      done\n      dueSoon\n    }\n    dueSoonTasks {\n      id\n      title\n      status\n      priority\n      dueDate\n      createdAt\n      project {\n        id\n        name\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

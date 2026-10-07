@@ -32,6 +32,7 @@ export default function DeleteTaskDialog({
   const [deleteTask, { loading: deleting }] = useMutation(DeleteTaskDocument, {
     update(cache) {
       cache.evict({ fieldName: "tasks" });
+      cache.evict({ fieldName: "dashboard" });
       cache.gc();
     },
   });

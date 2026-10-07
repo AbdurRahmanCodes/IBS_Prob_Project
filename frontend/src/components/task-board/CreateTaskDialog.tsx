@@ -43,6 +43,7 @@ export default function CreateTaskDialog({
   const [createTask, { loading: creating }] = useMutation(CreateTaskDocument, {
     update(cache) {
       cache.evict({ fieldName: "tasks" });
+      cache.evict({ fieldName: "dashboard" });
       cache.gc();
     },
   });
