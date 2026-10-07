@@ -73,12 +73,12 @@ export default function StatCards({ stats, loading = false }: StatCardsProps) {
       <Typography variant="h6" component="h2" sx={{ mb: 2, fontWeight: 600 }}>
         Dashboard Overview
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} columns={{ xs: 12, sm: 6, md: 10 }}>
         {STAT_CONFIG.map((config) => {
           const value = stats?.[config.key] ?? 0;
 
           return (
-            <Grid size={{ xs: 12, sm: 6, md: 2.4 }} key={config.key}>
+            <Grid size={{ xs: 12, sm: 3, md: 2 }} key={config.key}>
               <Card
                 variant="outlined"
                 sx={{

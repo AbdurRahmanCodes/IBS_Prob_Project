@@ -198,14 +198,14 @@ export default function DashboardPage() {
       />
 
       <EditTaskDialog
-        key={editingTask?.id ?? "none"}
+        key={editingTask ? `edit-${editingTask.id}` : "edit-task-dialog"}
         open={Boolean(editingTask)}
         onClose={() => setEditingTask(null)}
         task={editingTask}
       />
 
       <DeleteTaskDialog
-        key={deletingTask?.id ?? "none"}
+        key={deletingTask ? `delete-${deletingTask.id}` : "delete-task-dialog"}
         open={Boolean(deletingTask)}
         onClose={() => setDeletingTask(null)}
         task={deletingTask}
