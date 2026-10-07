@@ -5,6 +5,7 @@ mutation CreateTask($input: CreateTaskInput!) {
     description
     status
     priority
+    dueDate
     createdAt
   }
 }
@@ -23,6 +24,7 @@ mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
     description
     status
     priority
+    dueDate
     createdAt
   }
 }

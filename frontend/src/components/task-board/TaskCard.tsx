@@ -35,7 +35,12 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const isOwner = Boolean(currentUserId && task.project.owner.id === currentUserId);
 
   const [statusError, setStatusError] = useState("");
-  const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument);
+  const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument, {
+    update(cache) {
+      cache.evict({ fieldName: "dashboard" });
+      cache.gc();
+    },
+  });
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     if (newStatus === task.status) return;
@@ -139,6 +144,26 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
           >
             {task.priority}
           </Box>
+
+          {task.dueDate && (
+            <Typography
+              variant="caption"
+              sx={{
+                ml: "auto",
+                fontWeight: 500,
+                color:
+                  task.status !== "DONE" &&
+                  new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0))
+                    ? "error.main"
+                    : "text.secondary",
+              }}
+            >
+              {task.status !== "DONE" &&
+              new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0))
+                ? `Overdue: ${task.dueDate.split("T")[0]}`
+                : `Due: ${task.dueDate.split("T")[0]}`}
+            </Typography>
+          )}
         </Box>
       </CardContent>
     </Card>

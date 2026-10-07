@@ -6,6 +6,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Container,
   Grid,
@@ -15,6 +16,7 @@ import {
 import { useAuthStore } from "@/store/auth-store";
 import {
   CreateProjectDocument,
+  GetDashboardDocument,
   GetProjectsDocument,
   GetTasksDocument,
 } from "@/graphql/generated/graphql";
@@ -22,6 +24,7 @@ import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
 import EditTaskDialog from "@/components/task-board/EditTaskDialog";
 import DeleteTaskDialog from "@/components/task-board/DeleteTaskDialog";
+import StatCards from "@/components/dashboard/StatCards";
 
 const PAGE_SIZE = 6;
 
@@ -49,6 +52,12 @@ export default function DashboardPage() {
     loading: loadingProjects,
     error: projectsError,
   } = useQuery(GetProjectsDocument);
+
+  const {
+    data: dashboardData,
+    loading: loadingDashboard,
+    error: dashboardError,
+  } = useQuery(GetDashboardDocument);
 
   const [createProject, { loading: creatingProject }] = useMutation(CreateProjectDocument, {
     refetchQueries: [{ query: GetProjectsDocument }],
@@ -109,6 +118,80 @@ export default function DashboardPage() {
       <Box sx={{ p: 3, mb: 4, bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}>
         <Typography variant="h6">Welcome back, {user?.name ?? "User"}!</Typography>
       </Box>
+
+      {dashboardError && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Failed to load dashboard metrics: {dashboardError.message}
+        </Alert>
+      )}
+
+      {!dashboardError && (
+        <StatCards stats={dashboardData?.dashboard.stats} loading={loadingDashboard} />
+      )}
+
+      {!dashboardError &&
+        dashboardData?.dashboard.dueSoonTasks &&
+        dashboardData.dashboard.dueSoonTasks.length > 0 && (
+          <Box
+            sx={{
+              p: 2.5,
+              mb: 4,
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              border: 1,
+              borderColor: "warning.light",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 1.5,
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "warning.dark" }}>
+                Upcoming Deadlines (Due within 7 days)
+              </Typography>
+              <Chip
+                label={`${dashboardData.dashboard.dueSoonTasks.length} urgent`}
+                size="small"
+                color="warning"
+                variant="outlined"
+              />
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {dashboardData.dashboard.dueSoonTasks.map((t) => (
+                <Box
+                  key={t.id}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    p: 1.5,
+                    borderRadius: 1,
+                    bgcolor: "action.hover",
+                  }}
+                >
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {t.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Project: {t.project.name} • Status: {t.status}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={t.dueDate ? `Due ${t.dueDate.split("T")[0]}` : "No date"}
+                    size="small"
+                    color="error"
+                    variant="filled"
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
 
       {seedError && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -182,14 +265,14 @@ export default function DashboardPage() {
       />
 
       <EditTaskDialog
-        key={editingTask?.id ?? "none"}
+        key={editingTask ? `edit-${editingTask.id}` : "edit-task-dialog"}
         open={Boolean(editingTask)}
         onClose={() => setEditingTask(null)}
         task={editingTask}
       />
 
       <DeleteTaskDialog
-        key={deletingTask?.id ?? "none"}
+        key={deletingTask ? `delete-${deletingTask.id}` : "delete-task-dialog"}
         open={Boolean(deletingTask)}
         onClose={() => setDeletingTask(null)}
         task={deletingTask}

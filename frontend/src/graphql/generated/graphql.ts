@@ -12,6 +12,7 @@ export type CreateProjectInput = {
 
 export type CreateTaskInput = {
   description?: string | null | undefined;
+  dueDate?: string | null | undefined;
   priority: TaskPriority;
   projectId: string | number;
   status: TaskStatus;
@@ -29,6 +30,7 @@ export type TaskStatus = "DONE" | "IN_PROGRESS" | "TODO";
 
 export type UpdateTaskInput = {
   description?: string | null | undefined;
+  dueDate?: string | null | undefined;
   priority?: TaskPriority | null | undefined;
   status?: TaskStatus | null | undefined;
   title?: string | null | undefined;
@@ -51,6 +53,7 @@ export type CreateTaskMutation = {
     description: string | null;
     status: TaskStatus;
     priority: TaskPriority;
+    dueDate: string | null;
     createdAt: string;
   };
 };
@@ -73,6 +76,7 @@ export type UpdateTaskMutation = {
     description: string | null;
     status: TaskStatus;
     priority: TaskPriority;
+    dueDate: string | null;
     createdAt: string;
   };
 };
@@ -82,6 +86,23 @@ export type DeleteTaskMutationVariables = Exact<{
 }>;
 
 export type DeleteTaskMutation = { deleteTask: string };
+
+export type GetDashboardQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetDashboardQuery = {
+  dashboard: {
+    stats: { total: number; todo: number; inProgress: number; done: number; dueSoon: number };
+    dueSoonTasks: Array<{
+      id: string;
+      title: string;
+      status: TaskStatus;
+      priority: TaskPriority;
+      dueDate: string | null;
+      createdAt: string;
+      project: { id: string; name: string };
+    }>;
+  };
+};
 
 export type DomainDataQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -113,6 +134,7 @@ export type GetTasksQuery = {
       description: string | null;
       status: TaskStatus;
       priority: TaskPriority;
+      dueDate: string | null;
       createdAt: string;
       project: { id: string; owner: { id: string } };
     }>;
@@ -214,6 +236,7 @@ export const CreateTaskDocument = {
                 { kind: "Field", name: { kind: "Name", value: "description" } },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 { kind: "Field", name: { kind: "Name", value: "priority" } },
+                { kind: "Field", name: { kind: "Name", value: "dueDate" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
               ],
             },
@@ -317,6 +340,7 @@ export const UpdateTaskDocument = {
                 { kind: "Field", name: { kind: "Name", value: "description" } },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 { kind: "Field", name: { kind: "Name", value: "priority" } },
+                { kind: "Field", name: { kind: "Name", value: "dueDate" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
               ],
             },
@@ -362,6 +386,70 @@ export const DeleteTaskDocument = {
     },
   ],
 } as unknown as DocumentNode<DeleteTaskMutation, DeleteTaskMutationVariables>;
+export const GetDashboardDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetDashboard" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "dashboard" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "stats" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "total" } },
+                      { kind: "Field", name: { kind: "Name", value: "todo" } },
+                      { kind: "Field", name: { kind: "Name", value: "inProgress" } },
+                      { kind: "Field", name: { kind: "Name", value: "done" } },
+                      { kind: "Field", name: { kind: "Name", value: "dueSoon" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dueSoonTasks" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "status" } },
+                      { kind: "Field", name: { kind: "Name", value: "priority" } },
+                      { kind: "Field", name: { kind: "Name", value: "dueDate" } },
+                      { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "project" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetDashboardQuery, GetDashboardQueryVariables>;
 export const DomainDataDocument = {
   kind: "Document",
   definitions: [
@@ -483,6 +571,7 @@ export const GetTasksDocument = {
                       { kind: "Field", name: { kind: "Name", value: "description" } },
                       { kind: "Field", name: { kind: "Name", value: "status" } },
                       { kind: "Field", name: { kind: "Name", value: "priority" } },
+                      { kind: "Field", name: { kind: "Name", value: "dueDate" } },
                       { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                       {
                         kind: "Field",

@@ -1,0 +1,23 @@
+query GetDashboard {
+  dashboard {
+    stats {
+      total
+      todo
+      inProgress
+      done
+      dueSoon
+    }
+    dueSoonTasks {
+      id
+      title
+      status
+      priority
+      dueDate
+      createdAt
+      project {
+        id
+        name
+      }
+    }
+  }
+}

@@ -1,6 +1,10 @@
 import { Task } from "../entities/Task";
 import { TaskStatus, TaskPriority } from "../entities/Task";
-import { TaskRepository } from "../repositories/TaskRepository";
+import {
+  TaskRepository,
+  type TaskStatsResult,
+  type UpdateTaskData,
+} from "../repositories/TaskRepository";
 import { ProjectRepository } from "../repositories/ProjectRepository";
 import { badInput, forbidden } from "../auth/errors";
 
@@ -10,6 +14,7 @@ export interface CreateTaskInput {
   status: TaskStatus;
   priority: TaskPriority;
   projectId: string;
+  dueDate?: string | null;
 }
 
 export interface UpdateTaskInput {
@@ -17,6 +22,7 @@ export interface UpdateTaskInput {
   description?: string | null;
   status?: TaskStatus;
   priority?: TaskPriority;
+  dueDate?: string | null;
 }
 
 export interface ListTasksInput {
@@ -30,6 +36,11 @@ export interface PaginatedTasksResponse {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface DashboardResponse {
+  stats: TaskStatsResult;
+  dueSoonTasks: Task[];
 }
 
 const DEFAULT_PAGE = 1;
@@ -90,7 +101,41 @@ export class TaskService {
       status: input.status,
       priority: input.priority,
       project: { id: project.id },
+      dueDate: this.parseDueDate(input.dueDate),
     });
+  }
+
+  private parseDueDate(dueDateStr?: string | null): Date | null | undefined {
+    if (dueDateStr === undefined) return undefined;
+    if (dueDateStr === null || dueDateStr.trim() === "") return null;
+
+    const trimmed = dueDateStr.trim();
+    // Validate ISO date prefix (YYYY-MM-DD)
+    const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+    if (!match) {
+      throw badInput("Due date must be in YYYY-MM-DD format");
+    }
+
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+
+    if (year < 2020 || year > 2100) {
+      throw badInput("Due date year must be between 2020 and 2100");
+    }
+    if (month < 1 || month > 12) {
+      throw badInput("Due date month must be between 01 and 12");
+    }
+    if (day < 1 || day > 31) {
+      throw badInput("Due date day must be between 01 and 31");
+    }
+
+    const parsed = new Date(trimmed);
+    if (isNaN(parsed.getTime())) {
+      throw badInput("Invalid due date");
+    }
+
+    return parsed;
   }
 
   private async findTaskAndCheckOwnership(id: string, userId: string): Promise<Task> {
@@ -114,12 +159,13 @@ export class TaskService {
       input.title === undefined &&
       input.description === undefined &&
       input.status === undefined &&
-      input.priority === undefined
+      input.priority === undefined &&
+      input.dueDate === undefined
     ) {
       return task;
     }
 
-    const updateData: UpdateTaskInput = {};
+    const updateData: UpdateTaskData = {};
 
     if (input.title !== undefined) {
       if (input.title === null) {
@@ -150,6 +196,10 @@ export class TaskService {
       updateData.priority = input.priority;
     }
 
+    if (input.dueDate !== undefined) {
+      updateData.dueDate = this.parseDueDate(input.dueDate);
+    }
+
     return this.repository.update(id, updateData);
   }
 
@@ -157,5 +207,17 @@ export class TaskService {
     await this.findTaskAndCheckOwnership(id, userId);
     await this.repository.delete(id);
     return id;
+  }
+
+  async getDashboardData(): Promise<DashboardResponse> {
+    const [stats, dueSoonTasks] = await Promise.all([
+      this.repository.getStats(),
+      this.repository.findDueSoon(5),
+    ]);
+
+    return {
+      stats,
+      dueSoonTasks,
+    };
   }
 }
