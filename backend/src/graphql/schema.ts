@@ -94,6 +94,7 @@ export const typeDefs = `#graphql
     login(input: LoginInput!): AuthPayload!
     createTask(input: CreateTaskInput!): Task!
     updateTask(id: ID!, input: UpdateTaskInput!): Task!
+    deleteTask(id: ID!): ID!
     createProject(input: CreateProjectInput!): Project!
   }
 `;

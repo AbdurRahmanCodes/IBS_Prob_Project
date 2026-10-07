@@ -21,6 +21,7 @@ import {
 import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
 import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
 import EditTaskDialog from "@/components/task-board/EditTaskDialog";
+import DeleteTaskDialog from "@/components/task-board/DeleteTaskDialog";
 
 const PAGE_SIZE = 6;
 
@@ -31,6 +32,7 @@ export default function DashboardPage() {
   const [page, setPage] = useState(1);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
+  const [deletingTask, setDeletingTask] = useState<TaskItem | null>(null);
   const [seedError, setSeedError] = useState("");
 
   const {
@@ -69,6 +71,12 @@ export default function DashboardPage() {
       });
     } catch (err) {
       setSeedError(err instanceof Error ? err.message : "Failed to create project");
+    }
+  };
+
+  const handleDeleteSuccess = () => {
+    if (tasks.length === 1 && page > 1) {
+      setPage((prev) => Math.max(1, prev - 1));
     }
   };
 
@@ -143,7 +151,11 @@ export default function DashboardPage() {
         {!tasksError &&
           tasks.map((task) => (
             <Grid size={{ xs: 12, sm: 6 }} key={task.id}>
-              <TaskCard task={task} onEdit={(t) => setEditingTask(t)} />
+              <TaskCard
+                task={task}
+                onEdit={(t) => setEditingTask(t)}
+                onDelete={(t) => setDeletingTask(t)}
+              />
             </Grid>
           ))}
       </Grid>
@@ -174,6 +186,14 @@ export default function DashboardPage() {
         open={Boolean(editingTask)}
         onClose={() => setEditingTask(null)}
         task={editingTask}
+      />
+
+      <DeleteTaskDialog
+        key={deletingTask?.id ?? "none"}
+        open={Boolean(deletingTask)}
+        onClose={() => setDeletingTask(null)}
+        task={deletingTask}
+        onSuccess={handleDeleteSuccess}
       />
     </Container>
   );

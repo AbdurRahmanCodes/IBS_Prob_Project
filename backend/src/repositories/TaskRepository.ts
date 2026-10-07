@@ -90,4 +90,11 @@ export class TaskRepository {
     const updated = await this.findById(id);
     return updated!;
   }
+
+  async delete(id: string): Promise<void> {
+    if (!UUID_REGEX.test(id)) {
+      return;
+    }
+    await AppDataSource.getRepository(Task).delete(id);
+  }
 }

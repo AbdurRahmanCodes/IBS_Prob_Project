@@ -26,3 +26,7 @@ mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
     createdAt
   }
 }
+
+mutation DeleteTask($id: ID!) {
+  deleteTask(id: $id)
+}

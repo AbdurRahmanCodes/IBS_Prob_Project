@@ -69,6 +69,10 @@ export const resolvers = {
       const userId = requireUserId(context);
       return taskService.updateTask(id, input, userId);
     },
+    deleteTask: (_parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
+      const userId = requireUserId(context);
+      return taskService.deleteTask(id, userId);
+    },
     createProject: (
       _parent: unknown,
       { input }: { input: CreateProjectInput },

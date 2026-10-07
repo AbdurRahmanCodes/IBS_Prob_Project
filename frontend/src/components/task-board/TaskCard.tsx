@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { Alert, Box, Button, Card, CardContent, MenuItem, Select, Typography } from "@mui/material";
+import { useAuthStore } from "@/store/auth-store";
 import {
   UpdateTaskDocument,
   type GetTasksQuery,
@@ -14,6 +15,7 @@ export type TaskItem = GetTasksQuery["tasks"]["items"][number];
 interface TaskCardProps {
   task: TaskItem;
   onEdit: (task: TaskItem) => void;
+  onDelete: (task: TaskItem) => void;
 }
 
 const statusBgColors: Record<TaskStatus, string> = {
@@ -28,7 +30,10 @@ const statusTextColors: Record<TaskStatus, string> = {
   DONE: "success.contrastText",
 };
 
-export default function TaskCard({ task, onEdit }: TaskCardProps) {
+export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
+  const currentUserId = useAuthStore((state) => state.user?.id);
+  const isOwner = Boolean(currentUserId && task.project.owner.id === currentUserId);
+
   const [statusError, setStatusError] = useState("");
   const [updateTask, { loading: updatingStatus }] = useMutation(UpdateTaskDocument);
 
@@ -56,14 +61,27 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
           <Typography variant="h6" component="h2" sx={{ wordBreak: "break-word" }}>
             {task.title}
           </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => onEdit(task)}
-            sx={{ ml: 1, minWidth: 60 }}
-          >
-            Edit
-          </Button>
+          {isOwner && (
+            <Box sx={{ display: "flex", gap: 1, ml: 1, flexShrink: 0 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => onEdit(task)}
+                sx={{ minWidth: 60 }}
+              >
+                Edit
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="error"
+                onClick={() => onDelete(task)}
+                sx={{ minWidth: 60 }}
+              >
+                Delete
+              </Button>
+            </Box>
+          )}
         </Box>
 
         {task.description && (
@@ -90,7 +108,7 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
           <Select
             size="small"
             value={task.status}
-            disabled={updatingStatus}
+            disabled={updatingStatus || !isOwner}
             inputProps={{ "aria-label": "Task status" }}
             onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
             sx={{
