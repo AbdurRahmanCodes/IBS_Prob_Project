@@ -108,10 +108,33 @@ export class TaskService {
   private parseDueDate(dueDateStr?: string | null): Date | null | undefined {
     if (dueDateStr === undefined) return undefined;
     if (dueDateStr === null || dueDateStr.trim() === "") return null;
-    const parsed = new Date(dueDateStr);
-    if (isNaN(parsed.getTime())) {
-      throw badInput("Invalid dueDate format");
+
+    const trimmed = dueDateStr.trim();
+    // Validate ISO date prefix (YYYY-MM-DD)
+    const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+    if (!match) {
+      throw badInput("Due date must be in YYYY-MM-DD format");
     }
+
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+
+    if (year < 2020 || year > 2100) {
+      throw badInput("Due date year must be between 2020 and 2100");
+    }
+    if (month < 1 || month > 12) {
+      throw badInput("Due date month must be between 01 and 12");
+    }
+    if (day < 1 || day > 31) {
+      throw badInput("Due date day must be between 01 and 31");
+    }
+
+    const parsed = new Date(trimmed);
+    if (isNaN(parsed.getTime())) {
+      throw badInput("Invalid due date");
+    }
+
     return parsed;
   }
 

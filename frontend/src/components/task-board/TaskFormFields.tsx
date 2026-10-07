@@ -1,7 +1,11 @@
-"use client";
-
-import { Box, MenuItem, TextField } from "@mui/material";
+import { Box, Chip, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import type { TaskPriority, TaskStatus } from "@/graphql/generated/graphql";
+
+function getOffsetDateStr(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split("T")[0];
+}
 
 interface TaskFormFieldsProps {
   title: string;
@@ -30,6 +34,10 @@ export default function TaskFormFields({
   onDueDateChange,
   autoFocusTitle = false,
 }: TaskFormFieldsProps) {
+  const todayStr = getOffsetDateStr(0);
+  const tomorrowStr = getOffsetDateStr(1);
+  const nextWeekStr = getOffsetDateStr(7);
+
   return (
     <>
       <TextField
@@ -79,8 +87,55 @@ export default function TaskFormFields({
           label="Due Date"
           value={dueDate}
           onChange={(e) => onDueDateChange(e.target.value)}
-          slotProps={{ inputLabel: { shrink: true } }}
+          slotProps={{
+            inputLabel: { shrink: true },
+            htmlInput: { min: todayStr, max: "2099-12-31" },
+          }}
+          helperText="Optional deadline"
         />
+      </Box>
+
+      <Box sx={{ mt: 1 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+          Quick deadlines:
+        </Typography>
+        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", gap: 0.5 }}>
+          <Chip
+            label="Today"
+            size="small"
+            variant={dueDate === todayStr ? "filled" : "outlined"}
+            color={dueDate === todayStr ? "primary" : "default"}
+            onClick={() => onDueDateChange(todayStr)}
+            clickable
+          />
+          <Chip
+            label="Tomorrow"
+            size="small"
+            variant={dueDate === tomorrowStr ? "filled" : "outlined"}
+            color={dueDate === tomorrowStr ? "primary" : "default"}
+            onClick={() => onDueDateChange(tomorrowStr)}
+            clickable
+          />
+          <Chip
+            label="In 1 Week"
+            size="small"
+            variant={dueDate === nextWeekStr ? "filled" : "outlined"}
+            color={dueDate === nextWeekStr ? "primary" : "default"}
+            onClick={() => onDueDateChange(nextWeekStr)}
+            clickable
+          />
+          {dueDate && (
+            <Chip
+              label="Clear Date"
+              size="small"
+              variant="outlined"
+              color="error"
+              onDelete={() => onDueDateChange("")}
+              onClick={() => onDueDateChange("")}
+              clickable
+            />
+          )}
+        </Stack>
       </Box>
     </>
   );

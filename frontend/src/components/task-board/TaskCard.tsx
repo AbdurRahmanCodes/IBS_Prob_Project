@@ -146,8 +146,22 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
           </Box>
 
           {task.dueDate && (
-            <Typography variant="caption" color="text.secondary" sx={{ ml: "auto" }}>
-              Due: {task.dueDate.split("T")[0]}
+            <Typography
+              variant="caption"
+              sx={{
+                ml: "auto",
+                fontWeight: 500,
+                color:
+                  task.status !== "DONE" &&
+                  new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0))
+                    ? "error.main"
+                    : "text.secondary",
+              }}
+            >
+              {task.status !== "DONE" &&
+              new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0))
+                ? `Overdue: ${task.dueDate.split("T")[0]}`
+                : `Due: ${task.dueDate.split("T")[0]}`}
             </Typography>
           )}
         </Box>
