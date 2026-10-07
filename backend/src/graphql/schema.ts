@@ -101,7 +101,7 @@ export const typeDefs = `#graphql
     me: User
     users: [User!]!
     projects: [Project!]!
-    tasks(page: Int, pageSize: Int): PaginatedTasks!
+    tasks(page: Int, pageSize: Int, status: TaskStatus, projectId: ID): PaginatedTasks!
     dashboard: DashboardData!
   }
 

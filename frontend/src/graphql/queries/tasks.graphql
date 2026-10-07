@@ -1,5 +1,5 @@
-query GetTasks($page: Int, $pageSize: Int) {
-  tasks(page: $page, pageSize: $pageSize) {
+query GetTasks($page: Int, $pageSize: Int, $status: TaskStatus, $projectId: ID) {
+  tasks(page: $page, pageSize: $pageSize, status: $status, projectId: $projectId) {
     items {
       id
       title

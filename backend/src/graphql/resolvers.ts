@@ -39,11 +39,21 @@ export const resolvers = {
     },
     tasks: (
       _parent: unknown,
-      { page, pageSize }: { page?: number | null; pageSize?: number | null },
+      {
+        page,
+        pageSize,
+        status,
+        projectId,
+      }: {
+        page?: number | null;
+        pageSize?: number | null;
+        status?: TaskStatus | null;
+        projectId?: string | null;
+      },
       context: GraphQLContext,
     ) => {
       requireUserId(context);
-      return taskService.listTasks({ page, pageSize });
+      return taskService.listTasks({ page, pageSize, status, projectId });
     },
     dashboard: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
       requireUserId(context);
