@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   Alert,
@@ -9,6 +10,8 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogContent,
   Grid,
   Pagination,
   Typography,
@@ -22,11 +25,28 @@ import {
   type TaskStatus,
 } from "@/graphql/generated/graphql";
 import TaskCard, { type TaskItem } from "@/components/task-board/TaskCard";
-import CreateTaskDialog from "@/components/task-board/CreateTaskDialog";
-import EditTaskDialog from "@/components/task-board/EditTaskDialog";
-import DeleteTaskDialog from "@/components/task-board/DeleteTaskDialog";
 import TaskFilters from "@/components/task-board/TaskFilters";
 import StatCards from "@/components/dashboard/StatCards";
+
+const DialogLoadingFallback = () => (
+  <Dialog open>
+    <DialogContent
+      sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 4, minWidth: 280 }}
+    >
+      <CircularProgress size={32} />
+    </DialogContent>
+  </Dialog>
+);
+
+const CreateTaskDialog = dynamic(() => import("@/components/task-board/CreateTaskDialog"), {
+  loading: () => <DialogLoadingFallback />,
+});
+const EditTaskDialog = dynamic(() => import("@/components/task-board/EditTaskDialog"), {
+  loading: () => <DialogLoadingFallback />,
+});
+const DeleteTaskDialog = dynamic(() => import("@/components/task-board/DeleteTaskDialog"), {
+  loading: () => <DialogLoadingFallback />,
+});
 
 const PAGE_SIZE = 6;
 
@@ -296,27 +316,33 @@ export default function DashboardPage() {
         </Box>
       )}
 
-      <CreateTaskDialog
-        open={createDialogOpen}
-        onClose={() => setCreateDialogOpen(false)}
-        projects={projects}
-        onSuccess={() => setPage(1)}
-      />
+      {createDialogOpen && (
+        <CreateTaskDialog
+          open={createDialogOpen}
+          onClose={() => setCreateDialogOpen(false)}
+          projects={projects}
+          onSuccess={() => setPage(1)}
+        />
+      )}
 
-      <EditTaskDialog
-        key={editingTask ? `edit-${editingTask.id}` : "edit-task-dialog"}
-        open={Boolean(editingTask)}
-        onClose={() => setEditingTask(null)}
-        task={editingTask}
-      />
+      {editingTask && (
+        <EditTaskDialog
+          key={`edit-${editingTask.id}`}
+          open={Boolean(editingTask)}
+          onClose={() => setEditingTask(null)}
+          task={editingTask}
+        />
+      )}
 
-      <DeleteTaskDialog
-        key={deletingTask ? `delete-${deletingTask.id}` : "delete-task-dialog"}
-        open={Boolean(deletingTask)}
-        onClose={() => setDeletingTask(null)}
-        task={deletingTask}
-        onSuccess={handleDeleteSuccess}
-      />
+      {deletingTask && (
+        <DeleteTaskDialog
+          key={`delete-${deletingTask.id}`}
+          open={Boolean(deletingTask)}
+          onClose={() => setDeletingTask(null)}
+          task={deletingTask}
+          onSuccess={handleDeleteSuccess}
+        />
+      )}
     </Container>
   );
 }
